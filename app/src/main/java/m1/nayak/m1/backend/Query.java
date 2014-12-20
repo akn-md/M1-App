@@ -48,7 +48,7 @@ public class Query {
 //            e1.printStackTrace();
 //        }
 
-        getEnzymeQuestions(true, 10);
+        getEnzymeQuestions(true, 2);
     }
 
     public static void getEnzymeQuestions(boolean smart, int count) {
@@ -144,7 +144,7 @@ public class Query {
                 Collections.shuffle(answerChoices);
 
                 // create Question object and add to array list
-                MultipleChoice mc = new MultipleChoice(question, answer, answerChoices, score, date);
+                MultipleChoice mc = new MultipleChoice(question, answer, answerChoices, score, date, "Enzymes", stem2);
                 Control.questions.add(mc);
 
                 Log.d("ash", "Choices:");

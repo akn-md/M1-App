@@ -14,11 +14,17 @@ public abstract class Question {
     public Date lastAsked;
 
     public boolean answered;
+    public boolean answeredCorrectly;
 
-    public Question(String q, String a, int s, Date last) {
+    public String subject, topic;
+
+    public Question(String q, String a, int s, Date last, String sub, String top) {
         question = q;
         answer = a;
         score = s;
         lastAsked = last;
+        subject = sub;
+        topic = top;
+        answeredCorrectly = true;
     }
 }

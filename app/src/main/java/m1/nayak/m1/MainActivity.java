@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import m1.nayak.m1.backend.Query;
 
 
-public class MainActivity extends ActionBarActivity implements QuizConfigureFragment.OnFragmentInteractionListener, QuizChoiceFragment.OnFragmentInteractionListener, QuizQuestionFragment.OnFragmentInteractionListener {
+public class MainActivity extends ActionBarActivity implements ResultsFragment.OnFragmentInteractionListener, QuizConfigureFragment.OnFragmentInteractionListener, QuizChoiceFragment.OnFragmentInteractionListener, QuizQuestionFragment.OnFragmentInteractionListener {
 
     public String fragmentLevel;
     public boolean fragmentMC;
@@ -89,11 +89,14 @@ public class MainActivity extends ActionBarActivity implements QuizConfigureFrag
                 fragment = QuizQuestionFragment.newInstance(false, curr, Control.questions.size());
                 break;
             case 2:
+                fragment = new ResultsFragment();
+                break;
+            case 3:
                 fragmentLevel = "main";
                 fragmentMC = false;
                 break;
             // Choose Classes
-            case 3:
+            case 4:
                 fragmentLevel = "class";
                 fragmentMC = true;
                 break;
@@ -176,11 +179,12 @@ public class MainActivity extends ActionBarActivity implements QuizConfigureFrag
     @Override
     public void onNextPressed(int c, boolean lastQuestion) {
 
-        if(!lastQuestion) {
+        if (!lastQuestion) {
             curr++;
             displayView(1, true);
         } else {
             // open quiz results page
+            displayView(2, true);
         }
     }
 
@@ -188,6 +192,11 @@ public class MainActivity extends ActionBarActivity implements QuizConfigureFrag
     public void onPrevPressed(int c) {
         curr--;
         displayView(1, false);
+    }
+
+    @Override
+    public void onResultsClosed(boolean save) {
+
     }
 
     /**

@@ -121,13 +121,16 @@ public class QuizQuestionFragment extends Fragment {
                         feedback.setVisibility(View.VISIBLE);
 
                         if (!q.answered) {
-                            // update score
-                            int score = q.score;
-                            score += 20;
-                            if (score > 100)
-                                score = 100;
-                            q.score = score;
                             q.answered = true;
+
+                            // update score
+                            if(q.answeredCorrectly) {
+                                int score = q.score;
+                                score += 20;
+                                if (score > 100)
+                                    score = 100;
+                                q.score = score;
+                            }
 
                             // make navigation visible
                             next.setEnabled(true);
@@ -150,6 +153,7 @@ public class QuizQuestionFragment extends Fragment {
                             if (score < 0)
                                 score = 0;
                             q.score = score;
+                            q.answeredCorrectly = false;
                         }
                     }
                 }
