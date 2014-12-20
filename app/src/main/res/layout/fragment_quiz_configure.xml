@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/app_background"
+                android:orientation="vertical">
+    />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout">
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="General Knowledge"
+            android:id="@+id/CheckBox_GeneralKnowledge" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:text="Straight from First Aid and lectures, in both flash card and multiple choice formats, with some clinical stuff sprinkled in"
+            android:layout_height="wrap_content"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Diseases"
+            android:id="@+id/CheckBox_Diseases"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:text="Test your knowledge of diseases, with everything from pathophysiology to symptoms and treatments"
+            android:layout_height="wrap_content"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enzymes"
+            android:id="@+id/CheckBox_Enzymes"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:text="Focuses on enzymes of important metabolic pathways, along with their activators, inhibitors, and co-factors"
+            android:layout_height="wrap_content"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Drugs"
+            android:id="@+id/CheckBox_Drugs"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:text="Do you know your drugs? Test your knowledge on drug actions and treatment uses"
+            android:layout_height="wrap_content"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hormones"
+            android:id="@+id/CheckBox_Hormones"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:text="Hormones can be confusing, so they get their own category"
+            android:layout_height="wrap_content"/>
+
+        <View
+            android:layout_marginTop="10dp"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#000000" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Choose Classes (optional)"
+            android:id="@+id/Button_chooseClasses"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:text="If you don't choose, questions will be generated from all classes."
+            android:layout_height="wrap_content"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quiz me where I'm weak"
+            android:id="@+id/CheckBox_smartQuizzing"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:text="If checked, questions will either be generated from the topics you have low accuracies on or ones you haven't seen in a while"
+            android:layout_height="wrap_content"/>
+
+        <View
+            android:layout_marginTop="10dp"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="#000000" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Start"
+            android:id="@+id/Button_startQuiz"
+            android:layout_alignParentBottom="true"/>
+    </LinearLayout>
+</ScrollView>
