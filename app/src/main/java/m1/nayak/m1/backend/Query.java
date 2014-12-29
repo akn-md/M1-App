@@ -6,6 +6,9 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,12 +17,13 @@ import java.util.List;
 
 import m1.nayak.m1.Control;
 import m1.nayak.m1.objects.MultipleChoice;
+import m1.nayak.m1.objects.Subject;
 
 /**
  * Created by Ashwin on 12/17/14.
  */
 public class Query {
-    public static void getData(ArrayList<String> classes, ArrayList<String> categories, boolean smart) throws ParseException {
+    public static void getData(ArrayList<String> subClasses, ArrayList<String> categories, boolean smart) throws ParseException {
 //        String entity = "EnzymeTest";
 //        ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
 //        query.addAscendingOrder(entity);
@@ -44,7 +48,6 @@ public class Query {
 ////            }
 //
 //        } catch (ParseException e1) {
-//            // TODO Auto-generated catch block
 //            e1.printStackTrace();
 //        }
 
@@ -155,7 +158,6 @@ public class Query {
                 Log.d("ash", "Last asked = " + date);
             }
         } catch (ParseException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
@@ -163,6 +165,7 @@ public class Query {
         Collections.shuffle(Control.questions);
     }
 
+    // TODO: Null check for subclasses JSONArray
     public static void loadClasses() {
         String entity = "Class";
         ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
@@ -174,12 +177,29 @@ public class Query {
 
             for (int i = 0; i < ret.size(); i++) {
                 String s = ret.get(i).getString(entity);
-                Control.classes.add(s);
+                JSONArray subs = ret.get(i).getJSONArray("Subclasses");
+
+                ArrayList<String> subclasses = new ArrayList<String>(subs.length());
+                for(int j = 0; j < subs.length(); j++) {
+                    subclasses.add(subs.get(j).toString());
+                }
+                Collections.sort(subclasses);
+                Subject sub = new Subject(s, subclasses);
+
+                Control.classes.add(sub);
             }
 
+//            for(int i = 0; i < Control.classes.size(); i++) {
+//                Log.d("ASH", "Class = " + Control.classes.get(i).className);
+//                for(int j = 0; j < Control.classes.get(i).subclasses.size(); j++) {
+//                    Log.d("ASH", "Subclass = " + Control.classes.get(i).subclasses.get(j));
+//                }
+//            }
 
         } catch (ParseException e1) {
             e1.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

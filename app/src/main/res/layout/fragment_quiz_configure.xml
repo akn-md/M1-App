@@ -74,20 +74,6 @@
             android:layout_height="2dp"
             android:background="#000000" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Choose Classes (optional)"
-            android:id="@+id/Button_chooseClasses"
-            />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:text="If you don't choose, questions will be generated from all classes."
-            android:layout_height="wrap_content"/>
-
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -109,7 +95,7 @@
             android:layout_width="fill_parent"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
-            android:text="Start"
+            android:text="Next"
             android:id="@+id/Button_startQuiz"
             android:layout_alignParentBottom="true"/>
     </LinearLayout>

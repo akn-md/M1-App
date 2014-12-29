@@ -1,16 +1,13 @@
 package m1.nayak.m1;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -42,13 +39,6 @@ public class QuizConfigureFragment extends Fragment {
     CheckBox smartQuiz;
     // Start quiz
     Button startQuiz;
-
-    // Choose classes
-    Button chooseClasses;
-    Dialog classesDialog;
-    ListView chooseClassesList;
-    ArrayAdapter<String> chooseClassesListAdapter;
-//    ArrayList<String> classes;
 
     public static QuizConfigureFragment newInstance(String param1, String param2) {
         QuizConfigureFragment fragment = new QuizConfigureFragment();
@@ -85,23 +75,6 @@ public class QuizConfigureFragment extends Fragment {
         hormones = (CheckBox) rootView.findViewById(R.id.CheckBox_Hormones);
         smartQuiz = (CheckBox) rootView.findViewById(R.id.CheckBox_smartQuizzing);
         startQuiz = (Button) rootView.findViewById(R.id.Button_startQuiz);
-        chooseClasses = (Button) rootView.findViewById(R.id.Button_chooseClasses);
-
-        classesDialog = new Dialog(getActivity());
-        classesDialog.setContentView(R.layout.dialog_choose_classes);
-        classesDialog.setCancelable(true);
-        classesDialog.setTitle("Choose classes");
-
-        chooseClassesList = (ListView) classesDialog.findViewById(R.id.ListView_chooseClassesDialog);
-        chooseClassesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//        classes = new ArrayList<String>();
-//        classes.add("Anatomy");
-//        classes.add("Biochemistry");
-//        classes.add("Histology");
-//        classes.add("Nutrition");
-//        classes.add("Physiology");
-        chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, Control.classes);
-        chooseClassesList.setAdapter(chooseClassesListAdapter);
 
         startQuiz.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,27 +94,11 @@ public class QuizConfigureFragment extends Fragment {
                     if (hormones.isChecked())
                         categories.add("Hormones");
 
-                    ArrayList<String> chosenClasses = new ArrayList<String>();
-                    for (int i = 0; i < Control.classes.size(); i++) {
-                        if (chooseClassesList.isItemChecked(i))
-                            chosenClasses.add(Control.classes.get(i));
-                    }
-
-                    mListener.onQuizStarted(categories, chosenClasses, smartQuiz.isChecked());
+                    mListener.onQuizConfigured(categories, smartQuiz.isChecked());
                 }
             }
         });
 
-        chooseClasses.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Control.classes.size() == 0) {
-                    Toast.makeText(getActivity(), "Please check your internet connection, or wait a few seconds for data to load.", Toast.LENGTH_LONG).show();
-                } else {
-                    classesDialog.show();
-                }
-            }
-        });
         return rootView;
     }
 
@@ -173,6 +130,6 @@ public class QuizConfigureFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onQuizStarted(ArrayList<String> categories, ArrayList<String> classes, boolean smartQuiz);
+        public void onQuizConfigured(ArrayList<String> categories, boolean smartQuiz);
     }
 }

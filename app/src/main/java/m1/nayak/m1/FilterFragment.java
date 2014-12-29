@@ -1,22 +1,19 @@
 package m1.nayak.m1;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FilterFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FilterFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FilterFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,6 +25,15 @@ public class FilterFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    // ListView
+    ListView chooseClassesList;
+    ArrayAdapter<String> chooseClassesListAdapter;
+    Button next;
+    boolean sc;
+
+    // Chosen filters
+    ArrayList<String> chosenClasses, subclasses, chosenSubclasses;
 
     /**
      * Use this factory method to create a new instance of
@@ -63,8 +69,71 @@ public class FilterFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.fragment_filter, container, false);
+
+        // Expandable list view
+        chooseClassesList = (ListView) rootView.findViewById(R.id.ListView_chooseClasses);
+        chooseClassesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+        // get names of classes
+        ArrayList<String> c = new ArrayList<String>(Control.classes.size());
+        for(int i = 0; i < Control.classes.size(); i++) {
+            c.add(Control.classes.get(i).className);
+        }
+        Collections.sort(c);
+
+        chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, c);
+        chooseClassesList.setAdapter(chooseClassesListAdapter);
+        sc = false;
+
+        // Next filter
+        next = (Button) rootView.findViewById(R.id.Button_filter_next);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(sc) {
+                    // TODO: Make sure user has selected at least one subclass
+
+                    // Get selected subclasses
+                    chosenSubclasses = new ArrayList<String>();
+
+                    for (int i = 0; i < subclasses.size(); i++) {
+                        if (chooseClassesList.isItemChecked(i)) {
+                            chosenSubclasses.add(subclasses.get(i));
+                        }
+                    }
+
+                    mListener.onQuizFiltered(chosenClasses, chosenSubclasses);
+
+                } else {
+                    // TODO: Make sure user has selected at least one class
+
+                    // Get selected classes
+                    chosenClasses = new ArrayList<String>();
+                    subclasses = new ArrayList<String>();
+
+                    for (int i = 0; i < Control.classes.size(); i++) {
+                        if (chooseClassesList.isItemChecked(i)) {
+                            chosenClasses.add(Control.classes.get(i).className);
+                            for(int j = 0; j < Control.classes.get(i).subclasses.size(); j++) {
+                                subclasses.add(Control.classes.get(i).subclasses.get(j));
+                            }
+                        }
+                    }
+
+                    Collections.sort(subclasses);
+                    sc = true;
+                    chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, subclasses);
+                    chooseClassesList.setAdapter(chooseClassesListAdapter);
+
+                    next.setText("Start Quiz");
+                }
+            }
+        });
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_filter, container, false);
+        return rootView;
     }
 
 
@@ -97,7 +166,6 @@ public class FilterFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFiltersApplied(Uri uri);
+        public void onQuizFiltered(ArrayList<String> chosenClasses, ArrayList<String> chosenSubclasses);
     }
-
 }

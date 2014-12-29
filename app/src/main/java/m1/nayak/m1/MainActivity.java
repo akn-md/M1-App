@@ -1,7 +1,6 @@
 package m1.nayak.m1;
 
 import android.app.ProgressDialog;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,9 +28,12 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
     public String fragmentLevel;
     public boolean fragmentMC;
 
-    // Get questions
+    // for AsyncTasks
     ProgressDialog dialog;
+
+    // quiz parameters
     ArrayList<String> chosenClasses;
+    ArrayList<String> chosenSubclasses;
     ArrayList<String> chosenCategories;
     boolean smartQuiz;
 
@@ -99,11 +101,13 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
                 fragment = new ResultsFragment();
                 break;
             case 4:
+                fragment = new FilterFragment();
+            case 5:
                 fragmentLevel = "main";
                 fragmentMC = false;
                 break;
             // Choose Classes
-            case 5:
+            case 6:
                 fragmentLevel = "class";
                 fragmentMC = true;
                 break;
@@ -162,25 +166,11 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
 
     @Override
-    public void onQuizStarted(ArrayList<String> categories, ArrayList<String> classes, boolean smart) {
-        Control.questions.clear();
-
-        Log.v("POOP", "Chosen classes:");
-        for (String s : classes) {
-            Log.v("POOP", s);
-        }
-        Log.v("POOP", "Chosen categories:");
-        for (String s : categories) {
-            Log.v("POOP", s);
-        }
-        Log.v("POOP", "Smart quiz = " + smartQuiz);
-
-        chosenClasses = classes;
-        smartQuiz = smart;
+    public void onQuizConfigured(ArrayList<String> categories, boolean smart) {
         chosenCategories = categories;
+        smartQuiz = smart;
 
-        dialog = new ProgressDialog(this);
-        new GetQuestions().execute();
+        displayView(4, true);
     }
 
     @Override
@@ -211,8 +201,31 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
     }
 
     @Override
-    public void onFiltersApplied(Uri uri) {
-        
+    public void onQuizFiltered(ArrayList<String> cC, ArrayList<String> cSC) {
+        chosenClasses = cC;
+        chosenSubclasses = cSC;
+
+        Control.questions.clear();
+
+        Log.d("ASH", "Chosen classes:");
+        for (String s : chosenClasses) {
+            Log.d("ASH", s);
+        }
+
+        Log.d("ASH", "Chosen subclasses:");
+        for (String s : chosenSubclasses) {
+            Log.d("ASH", s);
+        }
+
+        Log.d("ASH", "Chosen categories:");
+        for (String s : chosenCategories) {
+            Log.d("ASH", s);
+        }
+
+        Log.d("ASH", "Smart quiz = " + smartQuiz);
+
+        dialog = new ProgressDialog(this);
+        new GetQuestions().execute();
     }
 
     /**
@@ -248,7 +261,7 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
         protected String doInBackground(String... args) {
             try {
-                Query.getData(chosenClasses, chosenCategories, smartQuiz);
+                Query.getData(chosenSubclasses, chosenCategories, smartQuiz);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
