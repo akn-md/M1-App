@@ -1,6 +1,7 @@
 package m1.nayak.m1;
 
 import android.app.ProgressDialog;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,9 +21,10 @@ import com.parse.ParseException;
 import java.util.ArrayList;
 
 import m1.nayak.m1.backend.Query;
+import m1.nayak.m1.backend.Update;
 
 
-public class MainActivity extends ActionBarActivity implements ResultsFragment.OnFragmentInteractionListener, QuizConfigureFragment.OnFragmentInteractionListener, QuizChoiceFragment.OnFragmentInteractionListener, QuizQuestionFragment.OnFragmentInteractionListener {
+public class MainActivity extends ActionBarActivity implements FilterFragment.OnFragmentInteractionListener, ResultsFragment.OnFragmentInteractionListener, QuizConfigureFragment.OnFragmentInteractionListener, QuizChoiceFragment.OnFragmentInteractionListener, QuizQuestionFragment.OnFragmentInteractionListener {
 
     public String fragmentLevel;
     public boolean fragmentMC;
@@ -80,23 +82,28 @@ public class MainActivity extends ActionBarActivity implements ResultsFragment.O
         Fragment fragment = null;
 
         switch (position) {
-            // Quiz settings
+            // Main menu
             case 0:
+                fragment = new PlaceholderFragment();
+                break;
+            // Quiz settings
+            case 1:
                 fragment = new QuizConfigureFragment();
                 break;
-
-            case 1:
+            // Quiz question
+            case 2:
                 fragment = QuizQuestionFragment.newInstance(false, curr, Control.questions.size());
                 break;
-            case 2:
+            // Quiz results
+            case 3:
                 fragment = new ResultsFragment();
                 break;
-            case 3:
+            case 4:
                 fragmentLevel = "main";
                 fragmentMC = false;
                 break;
             // Choose Classes
-            case 4:
+            case 5:
                 fragmentLevel = "class";
                 fragmentMC = true;
                 break;
@@ -181,22 +188,31 @@ public class MainActivity extends ActionBarActivity implements ResultsFragment.O
 
         if (!lastQuestion) {
             curr++;
-            displayView(1, true);
+            displayView(2, true);
         } else {
             // open quiz results page
-            displayView(2, true);
+            displayView(3, true);
         }
     }
 
     @Override
     public void onPrevPressed(int c) {
         curr--;
-        displayView(1, false);
+        displayView(2, false);
     }
 
     @Override
     public void onResultsClosed(boolean save) {
+        if (save) {
+            new UploadResults().execute();
+        } else {
+            displayView(0, false);
+        }
+    }
 
+    @Override
+    public void onFiltersApplied(Uri uri) {
+        
     }
 
     /**
@@ -217,7 +233,7 @@ public class MainActivity extends ActionBarActivity implements ResultsFragment.O
 
     // Button listeners
     public void quizMe(View view) {
-        displayView(0, true);
+        displayView(1, true);
     }
 
     class GetQuestions extends AsyncTask<String, String, String> {
@@ -253,7 +269,38 @@ public class MainActivity extends ActionBarActivity implements ResultsFragment.O
 //                        startActivity(i);
 //                    }
                     curr = 0;
-                    displayView(1, true);
+                    displayView(2, true);
+                }
+            });
+        }
+    }
+
+    class UploadResults extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Uploading results ...");
+            dialog.setIndeterminate(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Update.updateScores();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            dialog.dismiss();
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    displayView(0, false);
                 }
             });
         }

@@ -7,6 +7,8 @@ import java.util.Date;
  */
 public abstract class Question {
 
+    public String id;
+
     public String question;
     public String answer;
 
@@ -18,7 +20,8 @@ public abstract class Question {
 
     public String subject, topic;
 
-    public Question(String q, String a, int s, Date last, String sub, String top) {
+    public Question(String i, String q, String a, int s, Date last, String sub, String top) {
+        id = i;
         question = q;
         answer = a;
         score = s;

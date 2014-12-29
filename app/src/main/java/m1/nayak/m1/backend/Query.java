@@ -67,7 +67,8 @@ public class Query {
                 count = ret.size();
 
             for (int i = 0; i < count; i++) {
-                // get score and date
+                // get id, score and date
+                String id = ret.get(i).getObjectId();
                 int score = ret.get(i).getInt("Score");
                 Date date = ret.get(i).getUpdatedAt();
 
@@ -144,7 +145,7 @@ public class Query {
                 Collections.shuffle(answerChoices);
 
                 // create Question object and add to array list
-                MultipleChoice mc = new MultipleChoice(question, answer, answerChoices, score, date, "Enzymes", stem2);
+                MultipleChoice mc = new MultipleChoice(id, question, answer, answerChoices, score, date, "Enzymes", stem2);
                 Control.questions.add(mc);
 
                 Log.d("ash", "Choices:");

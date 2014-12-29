@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.HashMap;
@@ -33,20 +34,15 @@ public class ResultsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    // quiz results
     ListView results;
     ResultsAdapter adapter;
 
+    // buttons
+    ImageButton discard, save;
+
     private OnFragmentInteractionListener mListener;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ResultsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ResultsFragment newInstance(String param1, String param2) {
         ResultsFragment fragment = new ResultsFragment();
         Bundle args = new Bundle();
@@ -75,9 +71,30 @@ public class ResultsFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_results, container, false);
 
+        // set up list view
         results = (ListView) rootView.findViewById(R.id.ListView_results);
         adapter = new ResultsAdapter(getActivity());
         results.setAdapter(adapter);
+
+        // set up buttons
+        discard = (ImageButton) rootView.findViewById(R.id.Button_discard);
+        save = (ImageButton) rootView.findViewById(R.id.Button_save);
+
+        // goes back to main menu, discards all changes
+        discard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onResultsClosed(false);
+            }
+        });
+
+        // goes back to main menu, uploads score updates
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onResultsClosed(true);
+            }
+        });
 
         return rootView;
     }
