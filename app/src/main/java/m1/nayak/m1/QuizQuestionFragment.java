@@ -17,15 +17,6 @@ import android.widget.TextView;
 import m1.nayak.m1.objects.MultipleChoice;
 import m1.nayak.m1.objects.Question;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link QuizQuestionFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link QuizQuestionFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class QuizQuestionFragment extends Fragment {
     // Parameters
     private boolean multiAnswer;
@@ -50,7 +41,6 @@ public class QuizQuestionFragment extends Fragment {
     // navigation
     ImageButton next, prev;
 
-    // TODO: Rename and change types and number of parameters
     public static QuizQuestionFragment newInstance(boolean multi, int curr, int total) {
         QuizQuestionFragment fragment = new QuizQuestionFragment();
         Bundle args = new Bundle();
