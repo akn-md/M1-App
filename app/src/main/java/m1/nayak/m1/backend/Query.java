@@ -23,6 +23,9 @@ import m1.nayak.m1.objects.Subject;
  * Created by Ashwin on 12/17/14.
  */
 public class Query {
+
+    // TODO: Subclasses will be null if GK is not a category. Determine how many questions to draw from each category and filter accordingly.
+
     public static void getData(ArrayList<String> subClasses, ArrayList<String> categories, boolean smart) throws ParseException {
 //        String entity = "EnzymeTest";
 //        ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);

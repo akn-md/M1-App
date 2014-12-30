@@ -23,6 +23,8 @@ import m1.nayak.m1.backend.Query;
 import m1.nayak.m1.backend.Update;
 
 
+// TODO: Change button name based on what is checked. If General Knowledge is checked, name is "Next", if not, name is "Start Quiz"
+
 public class MainActivity extends ActionBarActivity implements FilterFragment.OnFragmentInteractionListener, ResultsFragment.OnFragmentInteractionListener, QuizConfigureFragment.OnFragmentInteractionListener, QuizChoiceFragment.OnFragmentInteractionListener, QuizQuestionFragment.OnFragmentInteractionListener {
 
     public String fragmentLevel;
@@ -169,6 +171,8 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
     public void onQuizConfigured(ArrayList<String> categories, boolean smart) {
         chosenCategories = categories;
         smartQuiz = smart;
+
+        // TODO: Only show view 4 (class filters) if General Knowledge category is checked, otherwise start quiz
 
         displayView(4, true);
     }

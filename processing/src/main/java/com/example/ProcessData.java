@@ -61,7 +61,7 @@ public class ProcessData {
             TextIO.putln("\"Topic\": \"" + data[6] + "\",");
 //            TextIO.putln("\"Count\": " + 0 + ",");
 //            TextIO.putln("\"Correct\": " + 0 + ",");
-            TextIO.putln("\"Score\": " + 0 + ",");
+            TextIO.putln("\"Score\": " + 0);
 
             boolean contained = false;
             for(int i = 0; i < classes.size(); i++) {

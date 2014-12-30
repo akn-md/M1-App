@@ -17,6 +17,9 @@ import android.widget.TextView;
 import m1.nayak.m1.objects.MultipleChoice;
 import m1.nayak.m1.objects.Question;
 
+// TODO: Handle flash card questions by changing layout dynamically and using flip animation?
+// TODO: For flash card questions, add thumbs up/down to layout for user input of correct/incorrect answer
+
 public class QuizQuestionFragment extends Fragment {
     // Parameters
     private boolean multiAnswer;
