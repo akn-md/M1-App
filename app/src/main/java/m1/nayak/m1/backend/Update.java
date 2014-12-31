@@ -13,6 +13,7 @@ import m1.nayak.m1.Control;
  */
 public class Update {
 
+    // TODO: Update scores based on question type
     public static void updateScores() throws ParseException {
         String entity = "EnzymeTest";
         ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);

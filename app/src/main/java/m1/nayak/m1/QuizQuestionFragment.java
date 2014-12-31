@@ -14,11 +14,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import m1.nayak.m1.objects.FlashCard;
 import m1.nayak.m1.objects.MultipleChoice;
 import m1.nayak.m1.objects.Question;
-
-// TODO: Handle flash card questions by changing layout dynamically and using flip animation?
-// TODO: For flash card questions, add thumbs up/down to layout for user input of correct/incorrect answer
 
 public class QuizQuestionFragment extends Fragment {
     // Parameters
@@ -30,13 +28,17 @@ public class QuizQuestionFragment extends Fragment {
 
     // question and answers
     Question q;
-    TextView question;
+    TextView question, answer;
     ListView answerChoices;
     ArrayAdapter<String> answerChoicesAdapter;
 
     // feedback
     TextView feedback;
     ImageView feedbackImage;
+
+    // FC feedback
+    ImageView thumbsUp, thumbsDown;
+    TextView correct;
 
     // progress
     ProgressBar quizProgress;
@@ -91,13 +93,14 @@ public class QuizQuestionFragment extends Fragment {
         question = (TextView) rootView.findViewById(R.id.TextView_question);
         question.setText(q.question);
 
+        // feedback
+        feedback = (TextView) rootView.findViewById(R.id.TextView_feedback);
+        feedbackImage = (ImageView) rootView.findViewById(R.id.ImageView_feedback);
+
+        answerChoices = (ListView) rootView.findViewById(R.id.listView_quizQuestion);
+
         // If multiple choice
         if (q instanceof MultipleChoice) {
-            // feedback
-            feedback = (TextView) rootView.findViewById(R.id.TextView_feedback);
-            feedbackImage = (ImageView) rootView.findViewById(R.id.ImageView_feedback);
-
-            answerChoices = (ListView) rootView.findViewById(R.id.listView_quizQuestion);
             answerChoicesAdapter = new ArrayAdapter<String>(getActivity(),
                     android.R.layout.simple_list_item_activated_1, android.R.id.text1, ((MultipleChoice) q).choices);
             answerChoices.setAdapter(answerChoicesAdapter);
@@ -116,15 +119,6 @@ public class QuizQuestionFragment extends Fragment {
                         if (!q.answered) {
                             q.answered = true;
 
-                            // update score
-                            if(q.answeredCorrectly) {
-                                int score = q.score;
-                                score += 20;
-                                if (score > 100)
-                                    score = 100;
-                                q.score = score;
-                            }
-
                             // make navigation visible
                             next.setEnabled(true);
                             if (currQuestion < Control.questions.size() - 1) {
@@ -139,20 +133,95 @@ public class QuizQuestionFragment extends Fragment {
                         feedbackImage.setVisibility(View.VISIBLE);
                         feedback.setVisibility(View.VISIBLE);
 
-                        if (!q.answered) {
-                            // update score
-                            int score = q.score;
-                            score -= 20;
-                            if (score < 0)
-                                score = 0;
-                            q.score = score;
+                        if (!q.answered)
                             q.answeredCorrectly = false;
-                        }
+                    }
+                }
+            });
+        } else if (q instanceof FlashCard) {
+            thumbsUp = (ImageView) rootView.findViewById(R.id.ImageView_thumbsUp);
+            thumbsDown = (ImageView) rootView.findViewById(R.id.ImageView_thumbsDown);
+            correct = (TextView) rootView.findViewById(R.id.TextView_getItRight);
+            answer = (TextView) rootView.findViewById(R.id.TextView_answer);
+
+            answer.setVisibility(View.VISIBLE);
+            answerChoices.setVisibility(View.INVISIBLE);
+            answer.setText("Click for answer");
+
+            answer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    answer.setText(q.answer);
+                    q.answered = true;
+
+                    // Make thumbs up and down visible
+                    thumbsUp.setVisibility(View.VISIBLE);
+                    thumbsDown.setVisibility(View.VISIBLE);
+                    correct.setVisibility(View.VISIBLE);
+                }
+            });
+
+//            ArrayList<String> asdf = new ArrayList<String>();
+//            asdf.add("Click for answer");
+//
+//            answerChoicesAdapter = new ArrayAdapter<String>(getActivity(),
+//                    android.R.layout.simple_list_item_activated_1, android.R.id.text1, asdf);
+//            answerChoices.setAdapter(answerChoicesAdapter);
+//
+//            answerChoices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                @Override
+//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                    ArrayList<String> asdf = new ArrayList<String>();
+//                    asdf.add(q.answer);
+//                    answerChoicesAdapter = new ArrayAdapter<String>(getActivity(),
+//                            android.R.layout.simple_list_item_activated_1, android.R.id.text1, asdf);
+//                    answerChoices.setAdapter(answerChoicesAdapter);
+//                    q.answered = true;
+//
+//                    // Make thumbs up and down visible
+//                    thumbsUp.setVisibility(View.VISIBLE);
+//                    thumbsDown.setVisibility(View.VISIBLE);
+//                    correct.setVisibility(View.VISIBLE);
+//                    feedbackRL.setVisibility(View.INVISIBLE);
+//                }
+//            });
+
+            thumbsUp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    thumbsUp.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_up_pressed));
+                    thumbsDown.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_down));
+                    q.answeredCorrectly = true;
+
+                    next.setEnabled(true);
+                    if (currQuestion < Control.questions.size() - 1) {
+                        next.setBackgroundResource(R.drawable.button_selector_next);
+                    } else {
+                        next.setBackgroundResource(R.drawable.button_selector_report);
                     }
                 }
             });
 
-            if (q.answered) {
+            thumbsDown.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    thumbsDown.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_down_pressed));
+                    thumbsUp.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_up));
+                    q.answeredCorrectly = false;
+
+                    next.setEnabled(true);
+                    if (currQuestion < Control.questions.size() - 1) {
+                        next.setBackgroundResource(R.drawable.button_selector_next);
+                    } else {
+                        next.setBackgroundResource(R.drawable.button_selector_report);
+                    }
+                }
+            });
+        }
+
+
+        if (q.answered) {
+            if (q instanceof MultipleChoice) {
                 int index = ((MultipleChoice) q).choices.indexOf(q.answer);
                 answerChoices.setItemChecked(index, true);
 
@@ -160,14 +229,27 @@ public class QuizQuestionFragment extends Fragment {
                 feedbackImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_correct));
                 feedbackImage.setVisibility(View.VISIBLE);
                 feedback.setVisibility(View.VISIBLE);
+            } else if (q instanceof FlashCard) {
+                answerChoices.setItemChecked(0, true);
+
+                thumbsUp.setVisibility(View.VISIBLE);
+                thumbsDown.setVisibility(View.VISIBLE);
+                correct.setVisibility(View.VISIBLE);
+
+                if (q.answeredCorrectly) {
+                    thumbsUp.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_up_pressed));
+                } else {
+                    thumbsDown.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_down_pressed));
+                }
             }
+
         }
 
         // Set up next and prev arrows
         if (!q.answered) {
             next.setEnabled(false);
 
-            if(currQuestion < Control.questions.size() - 1)
+            if (currQuestion < Control.questions.size() - 1)
                 next.setBackgroundResource(R.drawable.ic_action_next_disabled);
             else
                 next.setBackgroundResource(R.drawable.ic_action_report_disabled);
@@ -190,7 +272,7 @@ public class QuizQuestionFragment extends Fragment {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true:false;
+                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
                 mListener.onNextPressed(currQuestion, lastQuestion);
             }
         });

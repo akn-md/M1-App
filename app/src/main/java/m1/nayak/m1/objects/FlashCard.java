@@ -7,8 +7,11 @@ import java.util.Date;
  */
 public class FlashCard extends Question {
 
-    public FlashCard(String i, String q, String a, int s, Date last, String sub, String top) {
-        super(i, q, a, s, last, sub, top);
+    String hint;
+
+    public FlashCard(String e, String i, String q, String a, int s, Date last, String sub, String top, String h) {
+        super(e, i, q, a, s, last, sub, top);
+        hint = h;
     }
 
 }

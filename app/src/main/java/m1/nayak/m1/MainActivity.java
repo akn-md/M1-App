@@ -21,9 +21,11 @@ import java.util.ArrayList;
 
 import m1.nayak.m1.backend.Query;
 import m1.nayak.m1.backend.Update;
+import m1.nayak.m1.objects.Question;
 
 
 // TODO: Change button name based on what is checked. If General Knowledge is checked, name is "Next", if not, name is "Start Quiz"
+// TODO: Add settings page for following parameters: quiz length, smart quizzing, flash card grading
 
 public class MainActivity extends ActionBarActivity implements FilterFragment.OnFragmentInteractionListener, ResultsFragment.OnFragmentInteractionListener, QuizConfigureFragment.OnFragmentInteractionListener, QuizChoiceFragment.OnFragmentInteractionListener, QuizQuestionFragment.OnFragmentInteractionListener {
 
@@ -184,6 +186,9 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
             curr++;
             displayView(2, true);
         } else {
+            // calculate new scores
+            updateScores();
+
             // open quiz results page
             displayView(3, true);
         }
@@ -232,6 +237,26 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
         new GetQuestions().execute();
     }
 
+    public void updateScores() {
+        // TODO: factor time into score update
+
+        for(int i = 0; i < Control.questions.size(); i++) {
+            Question q = Control.questions.get(i);
+            int score = q.score;
+
+            if(q.answeredCorrectly) {
+                score += 20;
+                if (score > 100)
+                    score = 100;
+                q.score = score;
+            } else {
+                score -= 20;
+                if (score < 0)
+                    score = 0;
+                q.score = score;
+            }
+        }
+    }
     /**
      * A placeholder fragment containing a simple view.
      */

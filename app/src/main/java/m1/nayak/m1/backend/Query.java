@@ -13,15 +13,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import m1.nayak.m1.Control;
+import m1.nayak.m1.objects.FlashCard;
 import m1.nayak.m1.objects.MultipleChoice;
 import m1.nayak.m1.objects.Subject;
 
 /**
  * Created by Ashwin on 12/17/14.
  */
+
+// TODO: getDiseasesQuestions
+// TODO: getDrugsQuestions
+// TODO: getHormonesQuestions
+
 public class Query {
 
     // TODO: Subclasses will be null if GK is not a category. Determine how many questions to draw from each category and filter accordingly.
@@ -54,9 +61,118 @@ public class Query {
 //            e1.printStackTrace();
 //        }
 
-        getEnzymeQuestions(true, 2);
+        getGKQuestions(2);
+//        getEnzymeQuestions(true, 2);
     }
 
+    public static void getGKQuestions(int count) {
+        HashMap<String, ArrayList<String>> allAnswerChoices = new HashMap<String, ArrayList<String>>();
+
+        String entity = "GeneralKnowledge";
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
+
+        query.orderByAscending("Score");
+        query.setLimit(count);
+
+        List<ParseObject> ret = null;
+        try {
+            ret = query.find();
+            Log.d("ASH", "Retrieved " + ret.size() + " rows for " + entity + " entity.");
+
+            // separate question and answer sources
+            if (count > ret.size())
+                count = ret.size();
+
+            for (int i = 0; i < count; i++) {
+                // get id, score and date
+                String id = ret.get(i).getObjectId();
+                int score = ret.get(i).getInt("Score");
+                Date date = ret.get(i).getUpdatedAt();
+                String type = ret.get(i).getString("Type");
+                String hint = ret.get(i).getString("Hint");
+                String subclass = ret.get(i).getString("Subclass");
+                String topic = ret.get(i).getString("Topic");
+                String question = null, answer = null;
+
+                if (type.equals("FC")) {
+                    // Randomly choose question and answer
+                    double choice = Math.random();
+
+                    if (choice < 0.5) {
+                        // Stick with original question and answer
+                        question = ret.get(i).getString("Q");
+                        answer = ret.get(i).getString("A");
+                    } else {
+                        // Reverse Q and A
+                        answer = ret.get(i).getString("Q");
+                        question = ret.get(i).getString("A");
+                    }
+
+                    // Create question object and add
+                    FlashCard fc = new FlashCard(entity, id, question, answer, score, date, subclass, topic, hint);
+                    Control.questions.add(fc);
+
+                    // Type = multiple choice
+                } else {
+                    question = ret.get(i).getString("Q");
+                    answer = ret.get(i).getString("A");
+                    ArrayList<String> answerChoices = new ArrayList<String>(4);
+                    answerChoices.add(answer);
+
+                    // query answer choices for specific MC type if not already saved
+                    if (!allAnswerChoices.containsKey(type)) {
+                        ParseQuery<ParseObject> choicesQuery = ParseQuery.getQuery(entity);
+                        choicesQuery.orderByAscending("Score");
+                        choicesQuery.whereEqualTo("Type", type);
+
+                        List<ParseObject> choicesRet = choicesQuery.find();
+                        ArrayList<String> choicesToAdd = new ArrayList<String>(choicesRet.size());
+                        for (int j = 0; j < choicesRet.size(); j++) {
+                            String choice = choicesRet.get(j).getString("A");
+                            choicesToAdd.add(choice);
+                        }
+
+                        allAnswerChoices.put(type, choicesToAdd);
+                    }
+
+                    // Get list of all possible answer choices for specific MC type
+                    ArrayList<String> allChoices = allAnswerChoices.get(type);
+
+                    // If list is too small, add all of them (except for duplicate) and for "No choices left" for the rest
+                    if (allChoices.size() < 5) {
+                        for (int j = 0; j < allChoices.size(); j++) {
+                            if (!allChoices.get(j).equals(answer)) {
+                                answerChoices.add(allChoices.get(j));
+                            }
+                        }
+
+                        if (answerChoices.size() < 4) {
+                            for (int j = answerChoices.size(); j < 4; j++) {
+                                answerChoices.add("No choices left!");
+                            }
+                        }
+                    // If the list is not too small, select 3 non-duplicate choices randomly
+                    } else {
+                        for (int index = 1; index < 4; index++) {
+                            int val = -1;
+                            do {
+                                val = (int) (Math.random() * allChoices.size());
+                            } while (answerChoices.contains(allChoices.get(val)));
+                            answerChoices.add(allChoices.get(val));
+                        }
+                    }
+
+                    // Create question object and add
+                    MultipleChoice mc = new MultipleChoice(entity, id, question, answer, answerChoices, score, date, subclass, topic);
+                    Control.questions.add(mc);
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // TODO: if question or answer is null, try different random combo
     public static void getEnzymeQuestions(boolean smart, int count) {
         String entity = "EnzymeTest";
         ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
@@ -124,7 +240,7 @@ public class Query {
                 Log.d("ash", "A = " + answer);
 
                 // get the 3 other answer choices
-                if(answer == null)
+                if (answer == null)
                     answer = "NULL";
                 ArrayList<String> answerChoices = new ArrayList<String>(4);
                 answerChoices.add(answer);
@@ -151,7 +267,7 @@ public class Query {
                 Collections.shuffle(answerChoices);
 
                 // create Question object and add to array list
-                MultipleChoice mc = new MultipleChoice(id, question, answer, answerChoices, score, date, "Enzymes", stem2);
+                MultipleChoice mc = new MultipleChoice(entity, id, question, answer, answerChoices, score, date, "Enzymes", stem2);
                 Control.questions.add(mc);
 
                 Log.d("ash", "Choices:");
@@ -183,7 +299,7 @@ public class Query {
                 JSONArray subs = ret.get(i).getJSONArray("Subclasses");
 
                 ArrayList<String> subclasses = new ArrayList<String>(subs.length());
-                for(int j = 0; j < subs.length(); j++) {
+                for (int j = 0; j < subs.length(); j++) {
                     subclasses.add(subs.get(j).toString());
                 }
                 Collections.sort(subclasses);

@@ -1,58 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/app_background"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1"
     >
 
-    <RelativeLayout
-        android:id="@+id/Question_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <ScrollView
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
         android:background="#ca4c4d"
-        android:orientation="vertical"
-        android:tag="Question">
+        android:layout_weight="0.35"
+        android:layout_height="0dp">
 
         <TextView
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="10dp"
+            android:scrollbars="vertical"
             android:id="@+id/TextView_question"
-            android:padding="15dp"
             style="?android:textAppearanceLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:textStyle="bold"/>
         />
-    </RelativeLayout>
+    </ScrollView>
 
     <RelativeLayout
-        android:id="@+id/RL_listview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:background="@color/highlighted_text_material_dark"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_below="@id/Question_layout"
-        android:background="@color/highlighted_text_material_dark"
-        android:tag="Question">
+        android:layout_weight="0.35"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        >
 
         <ListView
-            android:choiceMode="singleChoice"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/listView_quizQuestion"
-            android:layout_alignParentTop="true"
             />
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:padding="10dp"
+                android:textStyle="bold"
+                android:scrollbars="vertical"
+                android:id="@+id/TextView_answer"
+                style="?android:textAppearanceLarge"
+                android:visibility="invisible"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </ScrollView>
     </RelativeLayout>
 
-
     <RelativeLayout
-        android:id="@+id/RL_feedback"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/RL_listview"
-        android:layout_centerHorizontal="true"
-        android:paddingTop="20dp"
+        android:layout_weight="0.15"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         >
 
         <ImageView
@@ -71,16 +86,48 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"/>
+
+
+        <ImageView
+            android:visibility="invisible"
+            android:paddingLeft="75dp"
+            android:id="@+id/ImageView_thumbsDown"
+            android:layout_width="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_action_thumbs_down"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:visibility="invisible"
+            android:id="@+id/TextView_getItRight"
+            style="?android:textAppearanceMedium"
+            android:textColor="#000000"
+            android:layout_centerInParent="true"
+            android:text="Get it right?"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:visibility="invisible"
+            android:paddingRight="75dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/ImageView_thumbsUp"
+            android:layout_width="wrap_content"
+            android:src="@drawable/ic_action_thumbs_up"
+            android:layout_alignParentRight="true"
+            android:layout_height="wrap_content"/>
     </RelativeLayout>
 
     <RelativeLayout
+        android:layout_weight="0.15"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_height="0dp"
         android:paddingLeft="100dp"
         android:paddingRight="100dp"
         android:id="@+id/RL_buttons"
         >
+
         <ImageButton
             android:id="@+id/Button_quizPrev"
             android:layout_width="wrap_content"
@@ -106,4 +153,4 @@
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 
-</RelativeLayout>
+</LinearLayout>

@@ -7,6 +7,7 @@ import java.util.Date;
  */
 public abstract class Question {
 
+    public String entity;
     public String id;
 
     public String question;
@@ -20,7 +21,8 @@ public abstract class Question {
 
     public String subject, topic;
 
-    public Question(String i, String q, String a, int s, Date last, String sub, String top) {
+    public Question(String e, String i, String q, String a, int s, Date last, String sub, String top) {
+        entity = e;
         id = i;
         question = q;
         answer = a;
