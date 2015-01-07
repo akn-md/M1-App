@@ -38,16 +38,10 @@
         android:layout_height="0dp"
         >
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/listView_quizQuestion"
-            />
-
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <TextView
                 android:gravity="center"
                 android:layout_gravity="center"
@@ -60,6 +54,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </ScrollView>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView_quizQuestion"
+            />
     </RelativeLayout>
 
     <RelativeLayout
@@ -70,23 +70,29 @@
         android:layout_marginRight="20dp"
         >
 
-        <ImageView
-            android:id="@+id/ImageView_feedback"
-            android:layout_width="wrap_content"
-            android:visibility="invisible"
-            android:paddingRight="5dp"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:id="@+id/TextView_feedback"
-            android:layout_toRightOf="@id/ImageView_feedback"
-            android:textColor="#000000"
-            android:visibility="invisible"
-            style="?android:textAppearanceMedium"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"/>
+            android:layout_centerInParent="true"
+            >
 
+            <ImageView
+                android:id="@+id/ImageView_feedback"
+                android:layout_width="wrap_content"
+                android:visibility="invisible"
+                android:paddingRight="5dp"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/TextView_feedback"
+                android:layout_toRightOf="@id/ImageView_feedback"
+                android:textColor="#000000"
+                android:visibility="invisible"
+                style="?android:textAppearanceMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"/>
+        </RelativeLayout>
 
         <ImageView
             android:visibility="invisible"

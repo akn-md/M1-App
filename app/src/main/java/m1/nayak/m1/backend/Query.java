@@ -32,7 +32,7 @@ import m1.nayak.m1.objects.Subject;
 public class Query {
 
     // TODO: Subclasses will be null if GK is not a category. Determine how many questions to draw from each category and filter accordingly.
-
+    // TODO: Actually filter by category
     public static void getData(ArrayList<String> subClasses, ArrayList<String> categories, boolean smart) throws ParseException {
 //        String entity = "EnzymeTest";
 //        ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
@@ -61,16 +61,17 @@ public class Query {
 //            e1.printStackTrace();
 //        }
 
-        getGKQuestions(2);
+        getGKQuestions(20, subClasses);
 //        getEnzymeQuestions(true, 2);
     }
 
-    public static void getGKQuestions(int count) {
+    public static void getGKQuestions(int count, ArrayList<String> subClasses) {
         HashMap<String, ArrayList<String>> allAnswerChoices = new HashMap<String, ArrayList<String>>();
 
         String entity = "GeneralKnowledge";
         ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
 
+        query.whereContainedIn("Subclass", subClasses);
         query.orderByAscending("Score");
         query.setLimit(count);
 
@@ -94,18 +95,23 @@ public class Query {
                 String topic = ret.get(i).getString("Topic");
                 String question = null, answer = null;
 
-                if (type.equals("FC")) {
+                if (type.equals("FC") || type.equals("SA")) {
                     // Randomly choose question and answer
                     double choice = Math.random();
 
-                    if (choice < 0.5) {
-                        // Stick with original question and answer
+                    if(type.equals("FC")) {
+                        if (choice < 0.5) {
+                            // Stick with original question and answer
+                            question = ret.get(i).getString("Q");
+                            answer = ret.get(i).getString("A");
+                        } else {
+                            // Reverse Q and A
+                            answer = ret.get(i).getString("Q");
+                            question = ret.get(i).getString("A");
+                        }
+                    } else {
                         question = ret.get(i).getString("Q");
                         answer = ret.get(i).getString("A");
-                    } else {
-                        // Reverse Q and A
-                        answer = ret.get(i).getString("Q");
-                        question = ret.get(i).getString("A");
                     }
 
                     // Create question object and add
@@ -162,6 +168,9 @@ public class Query {
                         }
                     }
 
+                    Collections.shuffle(answerChoices);
+                    Collections.shuffle(answerChoices);
+                    
                     // Create question object and add
                     MultipleChoice mc = new MultipleChoice(entity, id, question, answer, answerChoices, score, date, subclass, topic);
                     Control.questions.add(mc);

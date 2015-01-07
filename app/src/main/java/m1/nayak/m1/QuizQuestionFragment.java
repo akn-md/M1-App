@@ -98,6 +98,7 @@ public class QuizQuestionFragment extends Fragment {
         feedbackImage = (ImageView) rootView.findViewById(R.id.ImageView_feedback);
 
         answerChoices = (ListView) rootView.findViewById(R.id.listView_quizQuestion);
+        answerChoices.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         // If multiple choice
         if (q instanceof MultipleChoice) {

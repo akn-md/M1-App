@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,15 +107,19 @@ public class ResultsAdapter extends BaseAdapter {
 
         topics[0] = "TOPIC";
         results[0] = "QUIZ RESULT";
-        proficiencies[0] = "PROFICIENCY";
+        proficiencies[0] = "MASTERY";
 
         int count = 1;
         for (Map.Entry<String, Integer> entry : total.entrySet()) {
             topics[count] = entry.getKey();
             results[count] = correct.get(entry.getKey()) + "/" + entry.getValue();
-            proficiencies[count] = ((double) score.get(entry.getKey()) / (double) entry.getValue()) + "%";
 
-            Log.d("ASH", "Topic = " + entry.getKey() + ", Result = " + correct.get(entry.getKey()) + "/" + entry.getValue() + ",  Average score = " + (double) (score.get(entry.getKey()) / entry.getValue()));
+            double mastery = ((double) score.get(entry.getKey()) / (double) entry.getValue());
+            DecimalFormat df = new DecimalFormat("#.##");
+            mastery = Double.valueOf(df.format(mastery));
+            proficiencies[count] = mastery + "%";
+
+            Log.d("ASH", "Topic = " + entry.getKey() + ", Result = " + correct.get(entry.getKey()) + "/" + entry.getValue() + ",  Average score = " + mastery);
             count++;
         }
     }

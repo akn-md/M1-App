@@ -11,7 +11,7 @@ public class ProcessData {
     }
 
     public static void processQuestions() {
-        String root = "/Users/Ashwin/Drive/Developer/Projects/M1/imports/STEP I/step";
+        String root = "/Users/Ashwin/Drive/Developer/Projects/M1/imports/STEP I/Classes/Neuroanatomy";
 
         String pathToData = root + ".txt";
         String pathToDataJson = root + ".json";
