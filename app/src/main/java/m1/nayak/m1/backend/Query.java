@@ -95,7 +95,7 @@ public class Query {
                 String topic = ret.get(i).getString("Topic");
                 String question = null, answer = null;
 
-                if (type.equals("FC") || type.equals("SA")) {
+                if (type.equals("FC") || type.equals("SA") || type.equals("TF")) {
                     // Randomly choose question and answer
                     double choice = Math.random();
 
@@ -116,6 +116,10 @@ public class Query {
 
                     // Create question object and add
                     FlashCard fc = new FlashCard(entity, id, question, answer, score, date, subclass, topic, hint);
+                    if(type.equals("TF")) {
+                        fc.trueFalse = true;
+                        fc.question = "True of False: " + fc.question;
+                    }
                     Control.questions.add(fc);
 
                     // Type = multiple choice
@@ -170,7 +174,7 @@ public class Query {
 
                     Collections.shuffle(answerChoices);
                     Collections.shuffle(answerChoices);
-                    
+
                     // Create question object and add
                     MultipleChoice mc = new MultipleChoice(entity, id, question, answer, answerChoices, score, date, subclass, topic);
                     Control.questions.add(mc);

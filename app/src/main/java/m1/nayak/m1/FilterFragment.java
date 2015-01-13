@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +56,7 @@ public class FilterFragment extends Fragment {
 
         // get names of classes
         ArrayList<String> c = new ArrayList<String>(Control.classes.size());
-        for(int i = 0; i < Control.classes.size(); i++) {
+        for (int i = 0; i < Control.classes.size(); i++) {
             c.add(Control.classes.get(i).className);
         }
         Collections.sort(c);
@@ -69,9 +70,7 @@ public class FilterFragment extends Fragment {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(sc) {
-                    // TODO: Make sure user has selected at least one subclass
-
+                if (sc) {
                     // Get selected subclasses
                     chosenSubclasses = new ArrayList<String>();
 
@@ -81,11 +80,12 @@ public class FilterFragment extends Fragment {
                         }
                     }
 
-                    mListener.onQuizFiltered(chosenClasses, chosenSubclasses);
-
+                    if (chosenSubclasses.size() == 0) {
+                        Toast.makeText(getActivity(), "Select at least one subclass", Toast.LENGTH_LONG).show();
+                    } else {
+                        mListener.onQuizFiltered(chosenClasses, chosenSubclasses);
+                    }
                 } else {
-                    // TODO: Make sure user has selected at least one class
-
                     // Get selected classes
                     chosenClasses = new ArrayList<String>();
                     subclasses = new ArrayList<String>();
@@ -93,18 +93,22 @@ public class FilterFragment extends Fragment {
                     for (int i = 0; i < Control.classes.size(); i++) {
                         if (chooseClassesList.isItemChecked(i)) {
                             chosenClasses.add(Control.classes.get(i).className);
-                            for(int j = 0; j < Control.classes.get(i).subclasses.size(); j++) {
+                            for (int j = 0; j < Control.classes.get(i).subclasses.size(); j++) {
                                 subclasses.add(Control.classes.get(i).subclasses.get(j));
                             }
                         }
                     }
 
-                    Collections.sort(subclasses);
-                    sc = true;
-                    chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, subclasses);
-                    chooseClassesList.setAdapter(chooseClassesListAdapter);
+                    if (chosenClasses.size() == 0) {
+                        Toast.makeText(getActivity(), "Select at least one class", Toast.LENGTH_LONG).show();
+                    } else {
+                        Collections.sort(subclasses);
+                        sc = true;
+                        chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, subclasses);
+                        chooseClassesList.setAdapter(chooseClassesListAdapter);
 
-                    next.setText("Start Quiz");
+                        next.setText("Start Quiz");
+                    }
                 }
             }
         });
