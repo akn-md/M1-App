@@ -65,7 +65,7 @@ public class Query {
 //        getEnzymeQuestions(true, 2);
 
         // shuffle questions
-        Collections.shuffle(Control.questions);
+//        Collections.shuffle(Control.questions);
     }
 
     public static void getGKQuestions(int count, ArrayList<String> subClasses) {

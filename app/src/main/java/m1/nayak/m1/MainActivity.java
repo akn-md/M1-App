@@ -180,14 +180,15 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
     }
 
     @Override
-    public void onNextPressed(int c, boolean lastQuestion) {
+    public void onNextPressed(int c, boolean lastQuestion, int rating) {
 
+        Log.d("ASH", "Rating = " + rating);
         if (!lastQuestion) {
             curr++;
             displayView(2, true);
         } else {
             // calculate new scores
-            updateScores();
+//            updateScores();
 
             // open quiz results page
             displayView(3, true);
@@ -226,12 +227,12 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
             Log.d("ASH", s);
         }
 
-        Log.d("ASH", "Chosen categories:");
-        for (String s : chosenCategories) {
-            Log.d("ASH", s);
-        }
-
-        Log.d("ASH", "Smart quiz = " + smartQuiz);
+//        Log.d("ASH", "Chosen categories:");
+//        for (String s : chosenCategories) {
+//            Log.d("ASH", s);
+//        }
+//
+//        Log.d("ASH", "Smart quiz = " + smartQuiz);
 
         dialog = new ProgressDialog(this);
         new GetQuestions().execute();
@@ -257,9 +258,7 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
             }
         }
     }
-    /**
-     * A placeholder fragment containing a simple view.
-     */
+
     public static class PlaceholderFragment extends Fragment {
 
         public PlaceholderFragment() {
@@ -275,7 +274,7 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
     // Button listeners
     public void quizMe(View view) {
-        displayView(1, true);
+        displayView(4, true);
     }
 
     class GetQuestions extends AsyncTask<String, String, String> {
