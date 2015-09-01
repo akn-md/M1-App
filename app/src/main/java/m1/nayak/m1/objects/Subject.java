@@ -9,6 +9,7 @@ public class Subject {
 
     public String className;
     public ArrayList<String> subclasses;
+    public int count;
 
     public Subject(String c, ArrayList<String> s) {
         className = c;

@@ -25,10 +25,11 @@ public class FilterFragment extends Fragment {
     ListView chooseClassesList;
     ArrayAdapter<String> chooseClassesListAdapter;
     Button next;
-    boolean sc;
+    boolean sc, t;
 
     // Chosen filters
-    ArrayList<String> chosenClasses, subclasses, chosenSubclasses;
+    ArrayList<String> chosenClasses, subclasses, chosenSubclasses, topics, chosenTopics;
+    ArrayList<String> c;
 
     public static FilterFragment newInstance(String param1, String param2) {
         FilterFragment fragment = new FilterFragment();
@@ -55,15 +56,16 @@ public class FilterFragment extends Fragment {
         chooseClassesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         // get names of classes
-        ArrayList<String> c = new ArrayList<String>(Control.classes.size());
+        c = new ArrayList<String>(Control.classes.size());
         for (int i = 0; i < Control.classes.size(); i++) {
-            c.add(Control.classes.get(i).className);
+            c.add(Control.classes.get(i).className + " (" + Control.classes.get(i).count + " questions)");
         }
         Collections.sort(c);
 
         chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, c);
         chooseClassesList.setAdapter(chooseClassesListAdapter);
         sc = false;
+        t = false;
 
         // Next filter
         next = (Button) rootView.findViewById(R.id.Button_filter_next);
@@ -83,31 +85,70 @@ public class FilterFragment extends Fragment {
                     if (chosenSubclasses.size() == 0) {
                         Toast.makeText(getActivity(), "Select at least one subclass", Toast.LENGTH_LONG).show();
                     } else {
-                        mListener.onQuizFiltered(chosenClasses, chosenSubclasses);
+                        topics = new ArrayList<String>();
+
+                        for(int i = 0; i < Control.subclasses.size(); i++) {
+                            if(chosenSubclasses.contains(Control.subclasses.get(i).className)) {
+                                   topics.addAll(Control.subclasses.get(i).subclasses);
+                            }
+                        }
+
+                        Collections.sort(topics);
+                        t = true;
+                        sc = false;
+                        chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, topics);
+                        chooseClassesList.setAdapter(chooseClassesListAdapter);
+
+                        next.setText("Start Quiz");
+                    }
+
+
+                } else if(t) {
+                    // Get selected topics
+                    chosenTopics = new ArrayList<String>();
+
+                    for (int i = 0; i < topics.size(); i++) {
+                        if (chooseClassesList.isItemChecked(i)) {
+                            chosenTopics.add(topics.get(i));
+                        }
+                    }
+
+                    if (chosenTopics.size() == 0) {
+                        Toast.makeText(getActivity(), "Select at least one topic", Toast.LENGTH_LONG).show();
+                    } else {
+                        mListener.onQuizFiltered(chosenClasses, chosenSubclasses, chosenTopics);
                     }
                 } else {
                     // Get selected classes
                     chosenClasses = new ArrayList<String>();
                     subclasses = new ArrayList<String>();
+                    c.clear();
 
                     for (int i = 0; i < Control.classes.size(); i++) {
                         if (chooseClassesList.isItemChecked(i)) {
                             chosenClasses.add(Control.classes.get(i).className);
                             for (int j = 0; j < Control.classes.get(i).subclasses.size(); j++) {
+                                String scName = Control.classes.get(i).subclasses.get(j);
+                                for(int k = 0; k < Control.subclasses.size(); k++) {
+                                    if(scName.equals(Control.subclasses.get(k).className)) {
+                                        scName += " (" + Control.subclasses.get(k).count + " questions)";
+                                    }
+                                }
                                 subclasses.add(Control.classes.get(i).subclasses.get(j));
+                                c.add(scName);
                             }
                         }
                     }
 
+
                     if (chosenClasses.size() == 0) {
                         Toast.makeText(getActivity(), "Select at least one class", Toast.LENGTH_LONG).show();
                     } else {
+                        Collections.sort(c);
                         Collections.sort(subclasses);
                         sc = true;
-                        chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, subclasses);
+                        chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, c);
                         chooseClassesList.setAdapter(chooseClassesListAdapter);
-
-                        next.setText("Start Quiz");
                     }
                 }
             }
@@ -135,6 +176,6 @@ public class FilterFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        public void onQuizFiltered(ArrayList<String> chosenClasses, ArrayList<String> chosenSubclasses);
+        public void onQuizFiltered(ArrayList<String> chosenClasses, ArrayList<String> chosenSubclasses, ArrayList<String> chosenTopics);
     }
 }

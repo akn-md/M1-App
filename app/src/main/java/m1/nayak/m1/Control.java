@@ -13,5 +13,6 @@ public class Control {
     public static ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
 
     public static ArrayList<Subject> classes = new ArrayList<Subject>();
+    public static ArrayList<Subject> subclasses = new ArrayList<Subject>();
     public static ArrayList<Question> questions = new ArrayList<Question>();
 }

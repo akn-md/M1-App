@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
     // quiz parameters
     ArrayList<String> chosenClasses;
     ArrayList<String> chosenSubclasses;
+    ArrayList<String> chosenTopics;
     ArrayList<String> chosenCategories;
     boolean smartQuiz;
 
@@ -211,9 +212,10 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
     }
 
     @Override
-    public void onQuizFiltered(ArrayList<String> cC, ArrayList<String> cSC) {
+    public void onQuizFiltered(ArrayList<String> cC, ArrayList<String> cSC, ArrayList<String> cT) {
         chosenClasses = cC;
         chosenSubclasses = cSC;
+        chosenTopics = cT;
 
         Control.questions.clear();
 
@@ -224,6 +226,11 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
         Log.d("ASH", "Chosen subclasses:");
         for (String s : chosenSubclasses) {
+            Log.d("ASH", s);
+        }
+
+        Log.d("ASH", "Chosen topics:");
+        for (String s : chosenTopics) {
             Log.d("ASH", s);
         }
 
@@ -289,7 +296,7 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
         protected String doInBackground(String... args) {
             try {
-                Query.getData(chosenSubclasses, chosenCategories, smartQuiz);
+                Query.getData(chosenSubclasses, chosenTopics, chosenCategories, smartQuiz);
             } catch (ParseException e) {
                 e.printStackTrace();
             }

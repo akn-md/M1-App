@@ -117,7 +117,7 @@ public class ResultsAdapter extends BaseAdapter {
             double mastery = ((double) score.get(entry.getKey()) / (double) entry.getValue());
             DecimalFormat df = new DecimalFormat("#.##");
             mastery = Double.valueOf(df.format(mastery));
-            proficiencies[count] = mastery + "%";
+            proficiencies[count] = mastery + "";
 
             Log.d("ASH", "Topic = " + entry.getKey() + ", Result = " + correct.get(entry.getKey()) + "/" + entry.getValue() + ",  Average score = " + mastery);
             count++;

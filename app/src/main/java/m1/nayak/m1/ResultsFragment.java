@@ -107,7 +107,7 @@ public class ResultsFragment extends Fragment {
         }
 
         for (Map.Entry<String, Integer> entry : total.entrySet()) {
-            Log.d("ASH", "Topic = " + entry.getKey() + ", Result = " + correct.get(entry.getKey()) + "/" + entry.getValue() + ",  Average score = " + (double) (score.get(entry.getKey()) / entry.getValue()));
+            Log.d("ASH", "Topic = " + entry.getKey() + ", Result = " + correct.get(entry.getKey()) + "/" + entry.getValue() + ",  Average score = " + (double) (score.get(entry.getKey()) / ((double) entry.getValue())));
         }
     }
 

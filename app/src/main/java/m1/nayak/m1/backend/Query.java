@@ -33,7 +33,7 @@ public class Query {
 
     // TODO: Subclasses will be null if GK is not a category. Determine how many questions to draw from each category and filter accordingly.
     // TODO: Actually filter by category
-    public static void getData(ArrayList<String> subClasses, ArrayList<String> categories, boolean smart) throws ParseException {
+    public static void getData(ArrayList<String> subClasses, ArrayList<String> topics, ArrayList<String> categories, boolean smart) throws ParseException {
 //        String entity = "EnzymeTest";
 //        ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
 //        query.addAscendingOrder(entity);
@@ -61,20 +61,21 @@ public class Query {
 //            e1.printStackTrace();
 //        }
 
-        getGKQuestions(20, subClasses);
+        getGKQuestions(20, subClasses, topics);
 //        getEnzymeQuestions(true, 2);
 
         // shuffle questions
 //        Collections.shuffle(Control.questions);
     }
 
-    public static void getGKQuestions(int count, ArrayList<String> subClasses) {
+    public static void getGKQuestions(int count, ArrayList<String> subClasses, ArrayList<String> topics) {
         HashMap<String, ArrayList<String>> allAnswerChoices = new HashMap<String, ArrayList<String>>();
 
         String entity = "GeneralKnowledge";
         ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
 
         query.whereContainedIn("Subclass", subClasses);
+        query.whereContainedIn("Topic", topics);
         query.orderByAscending("Score");
         query.setLimit(count);
 
@@ -343,6 +344,13 @@ public class Query {
                 Collections.sort(subclasses);
                 Subject sub = new Subject(s, subclasses);
 
+                String getCount = "GeneralKnowledge";
+                ParseQuery<ParseObject> gcQuery = ParseQuery.getQuery(getCount);
+                gcQuery.whereEqualTo("Class", s);
+                sub.count = gcQuery.count();
+
+                Log.d("Parse", sub.count + " questions in Class " + s);
+
                 Control.classes.add(sub);
             }
 
@@ -352,6 +360,42 @@ public class Query {
 //                    Log.d("ASH", "Subclass = " + Control.classes.get(i).subclasses.get(j));
 //                }
 //            }
+
+        } catch (ParseException e1) {
+            e1.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        entity = "Subclass";
+        query = ParseQuery.getQuery(entity);
+        query.addAscendingOrder(entity);
+
+        try {
+            List<ParseObject> ret = query.find();
+            Log.d("Parse", "Retrieved " + ret.size() + " rows for " + entity + " entity.");
+
+            for (int i = 0; i < ret.size(); i++) {
+                String s = ret.get(i).getString(entity);
+                JSONArray tops = ret.get(i).getJSONArray("Topics");
+
+                ArrayList<String> topics = new ArrayList<String>(tops.length());
+                for (int j = 0; j < tops.length(); j++) {
+                    topics.add(tops.get(j).toString());
+                }
+                Collections.sort(topics);
+                Subject sub = new Subject(s, topics);
+
+                String getCount = "GeneralKnowledge";
+                ParseQuery<ParseObject> gcQuery = ParseQuery.getQuery(getCount);
+                gcQuery.whereEqualTo("Subclass", s);
+                sub.count = gcQuery.count();
+
+                Log.d("Parse", sub.count + " questions in Subclass " + s);
+
+
+                Control.subclasses.add(sub);
+            }
 
         } catch (ParseException e1) {
             e1.printStackTrace();
