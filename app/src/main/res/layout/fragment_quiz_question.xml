@@ -13,7 +13,7 @@
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:background="#ca4c4d"
-        android:layout_weight="0.35"
+        android:layout_weight="0.425"
         android:layout_height="0dp">
 
         <TextView
@@ -33,7 +33,7 @@
         android:background="@color/highlighted_text_material_dark"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_weight="0.35"
+        android:layout_weight="0.425"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         >
@@ -63,7 +63,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_weight="0.15"
+        android:layout_weight="0.05"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="20dp"
@@ -131,7 +131,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_weight="0.1"
+        android:layout_weight="0.05"
         android:gravity="center"
         android:orientation="horizontal">
 

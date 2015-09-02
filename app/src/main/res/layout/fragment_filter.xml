@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@color/app_background"
+              android:background="@color/background_floating_material_light"
               android:paddingBottom="@dimen/activity_vertical_margin"
               android:paddingLeft="@dimen/activity_horizontal_margin"
               android:paddingRight="@dimen/activity_horizontal_margin"
@@ -12,12 +12,24 @@
         android:layout_margin="10dp"
         android:id="@+id/Button_filter_next"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:text="Next"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:layout_margin="10dp"
+        android:id="@+id/Button_filter_prev"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Prev"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <ListView
         android:layout_alignParentTop="true"
+        android:dividerHeight="5dp"
+        android:divider="@color/background_floating_material_light"
         android:id="@+id/ListView_chooseClasses"
         android:layout_width="match_parent"
         android:layout_above="@id/Button_filter_next"

@@ -1,11 +1,14 @@
 package m1.nayak.m1;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +48,11 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
     // quiz navigation
     int curr;
 
+    ActionBar actionBar;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +68,9 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
         if (Control.classes.size() == 0)
             new LoadClasses().execute();
+
+        actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#1abc9c")));
     }
 
     @Override
@@ -275,6 +286,7 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
             return rootView;
         }
     }
@@ -358,11 +370,21 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+            dialog = new ProgressDialog(MainActivity.this);
+            dialog.setMessage("Updating...");
+            dialog.setIndeterminate(false);
+            dialog.setCancelable(false);
+            dialog.show();
         }
 
         protected String doInBackground(String... args) {
             Query.loadClasses();
             return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            dialog.dismiss();
         }
     }
 }
