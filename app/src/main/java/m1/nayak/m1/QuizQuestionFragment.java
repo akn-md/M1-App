@@ -3,6 +3,7 @@ package m1.nayak.m1;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,7 +163,23 @@ public class QuizQuestionFragment extends Fragment {
             answer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    answer.setText(q.answer);
+                    // add boldness
+                    if (q.answer.contains("*")) {
+                        String a = "";
+
+                        String[] parts = q.answer.split("\\*");
+
+                        for(int i = 0; i < parts.length; i++) {
+                            a += parts[i];
+                            i++;
+                            if(i<parts.length) a+= "<b>" + parts[i] + "</b>";
+                        }
+
+                        answer.setText(Html.fromHtml(a));
+                    } else {
+                        answer.setText(q.answer);
+                    }
+
                     q.answered = true;
 
                     feedback.setText("How well did you know it?");

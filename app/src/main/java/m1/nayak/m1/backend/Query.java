@@ -77,7 +77,7 @@ public class Query {
         query.whereContainedIn("Subclass", subClasses);
         query.whereContainedIn("Topic", topics);
         query.orderByAscending("Score");
-        query.setLimit(count);
+//        query.setLimit(count);
 
         List<ParseObject> ret = null;
         try {
@@ -85,10 +85,10 @@ public class Query {
             Log.d("ASH", "Retrieved " + ret.size() + " rows for " + entity + " entity.");
 
             // separate question and answer sources
-            if (count > ret.size())
-                count = ret.size();
+//            if (count > ret.size())
+//                count = ret.size();
 
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < ret.size(); i++) {
                 // get id, score and date
                 String id = ret.get(i).getObjectId();
                 int score = ret.get(i).getInt("Score");
@@ -122,7 +122,7 @@ public class Query {
                     FlashCard fc = new FlashCard(entity, id, question, answer, score, date, subclass, topic, hint);
                     if (type.equals("TF")) {
                         fc.trueFalse = true;
-                        fc.question = "True of False: " + fc.question;
+                        fc.question = "True or False: " + fc.question;
                     }
                     Control.questions.add(fc);
 
@@ -348,9 +348,39 @@ public class Query {
                 ParseQuery<ParseObject> gcQuery = ParseQuery.getQuery(getCount);
                 gcQuery.whereEqualTo("Class", s);
                 sub.count = gcQuery.count();
+                gcQuery.whereEqualTo("Score", 1);
+                double ones = gcQuery.count();
+//                Log.d("Parse", sub.count + " questions in Class " + s);
+//                Log.d("Parse", ones + " with score=1 in Class " + s);
 
-                Log.d("Parse", sub.count + " questions in Class " + s);
+                ParseQuery.getQuery(getCount);
+                gcQuery.whereEqualTo("Class", s);
+                gcQuery.whereEqualTo("Score", 2);
+                double twos = gcQuery.count();
+//                Log.d("Parse", twos + " with score=2 in Class " + s);
 
+                ParseQuery.getQuery(getCount);
+                gcQuery.whereEqualTo("Class", s);
+                gcQuery.whereEqualTo("Score", 3);
+                double threes = gcQuery.count();
+//                Log.d("Parse", threes + " with score=3 in Class " + s);
+
+                ParseQuery.getQuery(getCount);
+                gcQuery.whereEqualTo("Class", s);
+                gcQuery.whereEqualTo("Score", 4);
+                double fours = gcQuery.count();
+//                Log.d("Parse", fours + " with score=4 in Class " + s);
+
+                ParseQuery.getQuery(getCount);
+                gcQuery.whereEqualTo("Class", s);
+                gcQuery.whereEqualTo("Score", 5);
+                double fives = gcQuery.count();
+//                Log.d("Parse", fives + " with score=5 in Class " + s);
+
+                double classScore = (ones + 2*twos + 3*threes + 4*fours + 5*fives) / (double) sub.count;
+                Log.d("Parse", "Average Score for Class " + s + " = " + classScore);
+
+                Control.classScores.put(sub.className, classScore);
                 Control.classes.add(sub);
             }
 
@@ -366,9 +396,11 @@ public class Query {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
 
-        entity = "Subclass";
-        query = ParseQuery.getQuery(entity);
+    public static void loadSubClasses() {
+        String entity = "Subclass";
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
         query.addAscendingOrder(entity);
 
         try {
@@ -390,10 +422,40 @@ public class Query {
                 ParseQuery<ParseObject> gcQuery = ParseQuery.getQuery(getCount);
                 gcQuery.whereEqualTo("Subclass", s);
                 sub.count = gcQuery.count();
-
-                Log.d("Parse", sub.count + " questions in Subclass " + s);
-
-
+//                gcQuery.whereEqualTo("Score", 1);
+//                double ones = gcQuery.count();
+//                Log.d("Parse", ones + " with score=1");
+//
+//                ParseQuery.getQuery(getCount);
+//                gcQuery.whereEqualTo("Subclass", s);
+//                gcQuery.whereEqualTo("Score", 2);
+//                double twos = gcQuery.count();
+//                Log.d("Parse", twos + " with score=2");
+//
+//
+//                ParseQuery.getQuery(getCount);
+//                gcQuery.whereEqualTo("Subclass", s);
+//                gcQuery.whereEqualTo("Score", 3);
+//                double threes = gcQuery.count();
+//                Log.d("Parse", threes + " with score=3");
+//
+//                ParseQuery.getQuery(getCount);
+//                gcQuery.whereEqualTo("Subclass", s);
+//                gcQuery.whereEqualTo("Score", 4);
+//                double fours = gcQuery.count();
+//                Log.d("Parse", fours + " with score=4");
+//
+//                ParseQuery.getQuery(getCount);
+//                gcQuery.whereEqualTo("Subclass", s);
+//                gcQuery.whereEqualTo("Score", 5);
+//                double fives = gcQuery.count();
+//                Log.d("Parse", fives + " with score=5");
+//
+//
+//                double classScore = (ones + 2*twos + 3*threes + 4*fours + 5*fives) / (double) sub.count;
+//                Log.d("Parse", "Average Score for Subclass " + s + " = " + classScore);
+//
+//                Control.subClassScores.put(sub.className, classScore);
                 Control.subclasses.add(sub);
             }
 
@@ -402,5 +464,8 @@ public class Query {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        Control.subClassesLoaded = true;
     }
+
 }

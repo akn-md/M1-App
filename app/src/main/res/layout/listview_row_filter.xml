@@ -6,57 +6,20 @@
 
     >
 
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="3dp"
-        android:background="@android:color/holo_blue_light"
-        android:layout_alignParentTop="true"/>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="3dp"
-        android:background="@android:color/holo_blue_light"
-        android:layout_alignParentBottom="true"/>
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="fill_parent"
                   android:orientation="horizontal"
                   android:weightSum="1"
                   android:layout_height="50dp">
 
-        <View
-            android:layout_height="fill_parent"
-            android:layout_width="3dp"
-            android:layout_gravity="left"
-            android:background="@android:color/holo_blue_light"
-            />
-
-
         <TextView
             android:id="@+id/TextView_class"
             android:layout_width="0dp"
-            android:layout_weight="0.8"
+            android:layout_weight="1.0"
             android:layout_gravity="center"
             android:textSize="20dp"
-            android:textColor="@color/background_floating_material_dark"
             android:layout_marginLeft="5dp"
             android:layout_height="wrap_content"/>
-
-        <ProgressBar
-            android:id="@+id/ProgressBar_filter"
-            android:layout_width="0dp"
-            android:layout_weight="0.2"
-            android:layout_gravity="center"
-            android:layout_marginRight="5dp"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_height="wrap_content"/>
-
-        <View
-            android:layout_height="fill_parent"
-            android:layout_width="3dp"
-            android:background="@android:color/holo_blue_light"
-            android:layout_gravity="right"/>
 
     </LinearLayout>
 

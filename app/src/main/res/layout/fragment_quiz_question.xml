@@ -46,7 +46,6 @@
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:padding="10dp"
-                android:textStyle="bold"
                 android:scrollbars="vertical"
                 android:id="@+id/TextView_answer"
                 style="?android:textAppearanceLarge"

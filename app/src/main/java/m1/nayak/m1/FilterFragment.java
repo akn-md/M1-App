@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ public class FilterFragment extends Fragment {
 
     // updated flow
     int mode;
+
+    // progress
+    ProgressBar progress;
 
     public static FilterFragment newInstance(String param1, String param2) {
         FilterFragment fragment = new FilterFragment();
@@ -74,6 +78,8 @@ public class FilterFragment extends Fragment {
 //            }
 //        });
 
+        progress = (ProgressBar) rootView.findViewById(R.id.Progress_filterProgress);
+
         mode = 1;
         loadList();
 
@@ -101,7 +107,7 @@ public class FilterFragment extends Fragment {
                         subclasses = new ArrayList<String>();
 
                         for (int i = 0; i < Control.classes.size(); i++) {
-                            if (chooseClassesList.isItemChecked(i)) {
+                            if (Control.selectedItems[i]) {
                                 chosenClasses.add(Control.classes.get(i).className);
                                 for (int j = 0; j < Control.classes.get(i).subclasses.size(); j++) {
                                     subclasses.add(Control.classes.get(i).subclasses.get(j));
@@ -122,7 +128,7 @@ public class FilterFragment extends Fragment {
                         topics = new ArrayList<String>();
 
                         for (int i = 0; i < subclasses.size(); i++) {
-                            if (chooseClassesList.isItemChecked(i)) {
+                            if (Control.selectedItems[i]) {
                                 chosenSubclasses.add(subclasses.get(i));
                             }
                         }
@@ -148,7 +154,7 @@ public class FilterFragment extends Fragment {
                         chosenTopics = new ArrayList<String>();
 
                         for (int i = 0; i < topics.size(); i++) {
-                            if (chooseClassesList.isItemChecked(i)) {
+                            if (Control.selectedItems[i]) {
                                 chosenTopics.add(topics.get(i));
                             }
                         }
@@ -163,87 +169,6 @@ public class FilterFragment extends Fragment {
                     default:
                         break;
                 }
-
-
-//                if (sc) {
-//                    // Get selected subclasses
-//                    chosenSubclasses = new ArrayList<String>();
-//
-//                    for (int i = 0; i < subclasses.size(); i++) {
-//                        if (chooseClassesList.isItemChecked(i)) {
-//                            chosenSubclasses.add(subclasses.get(i));
-//                        }
-//                    }
-//
-//                    if (chosenSubclasses.size() == 0) {
-//                        Toast.makeText(getActivity(), "Select at least one subclass", Toast.LENGTH_LONG).show();
-//                    } else {
-//                        topics = new ArrayList<String>();
-//
-//                        for (int i = 0; i < Control.subclasses.size(); i++) {
-//                            if (chosenSubclasses.contains(Control.subclasses.get(i).className)) {
-//                                topics.addAll(Control.subclasses.get(i).subclasses);
-//                            }
-//                        }
-//
-//                        Collections.sort(topics);
-//                        t = true;
-//                        sc = false;
-//                        chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, topics);
-//                        chooseClassesList.setAdapter(chooseClassesListAdapter);
-//
-//                        next.setText("Start Quiz");
-//                    }
-//
-//
-//                } else if (t) {
-//                    // Get selected topics
-//                    chosenTopics = new ArrayList<String>();
-//
-//                    for (int i = 0; i < topics.size(); i++) {
-//                        if (chooseClassesList.isItemChecked(i)) {
-//                            chosenTopics.add(topics.get(i));
-//                        }
-//                    }
-//
-//                    if (chosenTopics.size() == 0) {
-//                        Toast.makeText(getActivity(), "Select at least one topic", Toast.LENGTH_LONG).show();
-//                    } else {
-//                        mListener.onQuizFiltered(chosenClasses, chosenSubclasses, chosenTopics);
-//                    }
-//                } else {
-//                    // Get selected classes
-//                    chosenClasses = new ArrayList<String>();
-//                    subclasses = new ArrayList<String>();
-//                    currList.clear();
-//
-//                    for (int i = 0; i < Control.classes.size(); i++) {
-//                        if (chooseClassesList.isItemChecked(i)) {
-//                            chosenClasses.add(Control.classes.get(i).className);
-//                            for (int j = 0; j < Control.classes.get(i).subclasses.size(); j++) {
-//                                String scName = Control.classes.get(i).subclasses.get(j);
-//                                for (int k = 0; k < Control.subclasses.size(); k++) {
-//                                    if (scName.equals(Control.subclasses.get(k).className)) {
-//                                        scName += " (" + Control.subclasses.get(k).count + " questions)";
-//                                    }
-//                                }
-//                                subclasses.add(Control.classes.get(i).subclasses.get(j));
-//                                currList.add(scName);
-//                            }
-//                        }
-//                    }
-//
-//
-//                    if (chosenClasses.size() == 0) {
-//                        Toast.makeText(getActivity(), "Select at least one class", Toast.LENGTH_LONG).show();
-//                    } else {
-//                        Collections.sort(currList);
-//                        Collections.sort(subclasses);
-//                        sc = true;
-//                        chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, currList);
-//                        chooseClassesList.setAdapter(chooseClassesListAdapter);
-//                    }
-//                }
             }
         });
 
@@ -278,7 +203,8 @@ public class FilterFragment extends Fragment {
                 // Show classes
                 classes = new ArrayList<String>(Control.classes.size());
                 for (int i = 0; i < Control.classes.size(); i++) {
-                    classes.add(Control.classes.get(i).className + " (" + Control.classes.get(i).count + " questions)");
+//                    classes.add(Control.classes.get(i).className + " (" + Control.classes.get(i).count + " questions)");
+                    classes.add(Control.classes.get(i).className);
                 }
 
                 Collections.sort(classes);
@@ -287,6 +213,21 @@ public class FilterFragment extends Fragment {
 
                 adapter = new FilterAdapter(getActivity(), classes, null);
                 chooseClassesList.setAdapter(adapter);
+
+                // set progress bar
+                double score = 0.0;
+                for (int i = 0; i < Control.classes.size(); i++) {
+                    score += Control.classScores.get(Control.classes.get(i).className);
+                }
+
+                score /= Control.classes.size();
+                score /= 5;
+                score *= 100;
+
+                Log.d("ASH", "score (Classes) =  " + score);
+
+                progress.setMax(100);
+                progress.setProgress((int) score);
 
                 break;
             case 2:
@@ -307,6 +248,30 @@ public class FilterFragment extends Fragment {
                 adapter = new FilterAdapter(getActivity(), subclasses, null);
                 chooseClassesList.setAdapter(adapter);
                 next.setText("Next");
+
+                // set progress bar
+//                score = 0.0;
+//                for (int i = 0; i < subclasses.size(); i++) {
+//                    score += Control.subClassScores.get(subclasses.get(i));
+//                }
+//
+//                score /= subclasses.size();
+//                score *= 100;
+//
+                score = 0.0;
+                for(int i = 0; i < chosenClasses.size(); i++) {
+                    score += Control.classScores.get(chosenClasses.get(i));
+                }
+
+                score /= chosenClasses.size();
+                score /= 5;
+                score *= 100;
+
+                Log.d("ASH", "score =  " + score);
+
+                progress.setMax(100);
+                progress.setProgress((int) score);
+
                 break;
             case 3:
                 // Show topics of chosen subclasses

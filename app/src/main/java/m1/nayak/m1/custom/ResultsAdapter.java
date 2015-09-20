@@ -106,20 +106,21 @@ public class ResultsAdapter extends BaseAdapter {
         proficiencies = new String[total.size() + 1];
 
         topics[0] = "TOPIC";
-        results[0] = "QUIZ RESULT";
+        results[0] = "NUMBER OF QUESTIONS";
         proficiencies[0] = "MASTERY";
 
         int count = 1;
         for (Map.Entry<String, Integer> entry : total.entrySet()) {
             topics[count] = entry.getKey();
-            results[count] = correct.get(entry.getKey()) + "/" + entry.getValue();
+//            results[count] = correct.get(entry.getKey()) + "/" + entry.getValue();
+            results[count] = "" + entry.getValue();
 
             double mastery = ((double) score.get(entry.getKey()) / (double) entry.getValue());
             DecimalFormat df = new DecimalFormat("#.##");
             mastery = Double.valueOf(df.format(mastery));
             proficiencies[count] = mastery + "";
 
-            Log.d("ASH", "Topic = " + entry.getKey() + ", Result = " + correct.get(entry.getKey()) + "/" + entry.getValue() + ",  Average score = " + mastery);
+            Log.d("ASH", "Topic = " + entry.getKey() + ", Num Questions = " + entry.getValue() + ",  Average score = " + mastery);
             count++;
         }
     }

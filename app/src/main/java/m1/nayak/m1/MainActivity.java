@@ -380,6 +380,31 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
         protected String doInBackground(String... args) {
             Query.loadClasses();
+            dialog.dismiss();
+            Query.loadSubClasses();
+
+            return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            dialog.dismiss();
+        }
+    }
+
+    class LoadSubclasses extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            dialog = new ProgressDialog(MainActivity.this);
+            dialog.setMessage("Loading...");
+            dialog.setIndeterminate(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        protected String doInBackground(String... args) {
+            Query.loadSubClasses();
             return null;
         }
 
