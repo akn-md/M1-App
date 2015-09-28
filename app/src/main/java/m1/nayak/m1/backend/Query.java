@@ -78,7 +78,7 @@ public class Query {
         query.whereContainedIn("Topic", topics);
         query.orderByAscending("createdAt");
 
-        if(mode == 3) {
+        if (mode == 3) {
             query.whereLessThan("Score_" + Control.user, Control.minScore);
         }
 
@@ -100,7 +100,6 @@ public class Query {
                 double score = ret.get(i).getDouble("Score_" + Control.user);
                 Date date = ret.get(i).getUpdatedAt();
                 String type = ret.get(i).getString("Type");
-                String hint = ret.get(i).getString("Hint");
                 String subclass = ret.get(i).getString("Subclass");
                 String topic = ret.get(i).getString("Topic");
                 String question = "", answer = null;
@@ -125,7 +124,7 @@ public class Query {
                     }
 
                     // Create question object and add
-                    FlashCard fc = new FlashCard(entity, id, question, answer, score, date, subclass, topic, hint);
+                    FlashCard fc = new FlashCard(entity, id, question, answer, score, date, subclass, topic);
                     if (type.equals("TF")) {
                         fc.trueFalse = true;
                         fc.question = "True or False: " + fc.question;
@@ -157,7 +156,7 @@ public class Query {
                             }
                         }
 
-                        Log.d("ASH","question = " + question);
+                        Log.d("ASH", "question = " + question);
                     } else {
                         question = ret.get(i).getString("Q");
                         answerChoices = new ArrayList<String>(4);
@@ -216,7 +215,7 @@ public class Query {
                 }
             }
 
-            if(mode != 1) {
+            if (mode != 1) {
                 Collections.shuffle(Control.questions);
             }
         } catch (ParseException e) {
@@ -387,7 +386,7 @@ public class Query {
                 double fives = gcQuery.count();
 //                Log.d("Parse", fives + " with score=5 in Class " + s);
 
-                double classScore = (ones + 2*twos + 3*threes + 4*fours + 5*fives) / (double) sub.count;
+                double classScore = (ones + 2 * twos + 3 * threes + 4 * fours + 5 * fives) / (double) sub.count;
                 Log.d("Parse", "Average Score for Class " + s + " = " + classScore);
 
                 Control.classScores.put(sub.className, classScore);
@@ -480,4 +479,216 @@ public class Query {
         Control.subClassesLoaded = true;
     }
 
+    public static void getDailyQuestions(String[] data) throws ParseException {
+        ArrayList<Integer> usedIndicies = new ArrayList<Integer>();
+
+        Control.questions.clear();
+        HashMap<String, ArrayList<String>> allAnswerChoices = new HashMap<String, ArrayList<String>>();
+
+        int numQuestions = Integer.parseInt(data[0]);
+        int percentageCurrent = Integer.parseInt(data[1]);
+
+
+        int numCurrQuestions = percentageCurrent * numQuestions / 100;
+        int numPastQuestions = numQuestions - numCurrQuestions;
+
+        String[] currSubClasses = null, pastSubClasses = null;
+
+        Log.d("ASH", numCurrQuestions + "," + numPastQuestions);
+
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Subclass");
+        query.whereEqualTo("isCurrentMaterial", true);
+        List<ParseObject> ret = query.find();
+
+        if (ret.size() > 0) {
+            currSubClasses = new String[ret.size()];
+            for (int i = 0; i < currSubClasses.length; i++) {
+                currSubClasses[i] = ret.get(i).getString("Subclass");
+            }
+        } else {
+            numCurrQuestions = 0;
+        }
+
+        query = ParseQuery.getQuery("Subclass");
+        query.whereEqualTo("isCurrentMaterial", false);
+        ret = query.find();
+
+        if (ret.size() > 0) {
+            pastSubClasses = new String[ret.size()];
+            for (int i = 0; i < pastSubClasses.length; i++) {
+                pastSubClasses[i] = ret.get(i).getString("Subclass");
+            }
+        } else {
+            numPastQuestions = 0;
+        }
+
+        for (int i = 0; i < numPastQuestions; i++) {
+            int combinedIndex = -1;
+            int qIndex = -1;
+
+            do {
+                int index = (int) (Math.random() * pastSubClasses.length);
+                String subClass = pastSubClasses[index];
+                query = ParseQuery.getQuery("GeneralKnowledge");
+                query.whereEqualTo("Subclass", subClass);
+                ret = query.find();
+
+                qIndex = (int) (Math.random() * ret.size());
+
+                String combined = index + "" + qIndex;
+
+                combinedIndex = Integer.parseInt(combined);
+                Log.d("ASH", index + "," + qIndex + "," + combinedIndex);
+            } while (usedIndicies.contains(combinedIndex));
+
+            usedIndicies.add(combinedIndex);
+            createQuestion(ret, qIndex, allAnswerChoices);
+        }
+
+        for (int i = 0; i < numCurrQuestions; i++) {
+            int combinedIndex = -1;
+            int qIndex = -1;
+
+            do {
+                int index = (int) (Math.random() * currSubClasses.length);
+                String subClass = currSubClasses[index];
+                query = ParseQuery.getQuery("GeneralKnowledge");
+                query.whereEqualTo("Subclass", subClass);
+                ret = query.find();
+
+                qIndex = (int) (Math.random() * ret.size());
+
+                String combined = index + "" + qIndex;
+
+                combinedIndex = Integer.parseInt(combined);
+                Log.d("ASH", index + "," + qIndex + "," + combinedIndex);
+            } while (usedIndicies.contains(combinedIndex));
+
+            usedIndicies.add(combinedIndex);
+            createQuestion(ret, qIndex, allAnswerChoices);
+        }
+
+    }
+
+    public static void createQuestion(List<ParseObject> ret, int i, HashMap<String, ArrayList<String>> allAnswerChoices) throws ParseException {
+        String id = ret.get(i).getObjectId();
+        double score = ret.get(i).getDouble("Score_" + Control.user);
+        Date date = ret.get(i).getUpdatedAt();
+        String type = ret.get(i).getString("Type");
+        String subclass = ret.get(i).getString("Subclass");
+        String topic = ret.get(i).getString("Topic");
+        String question = "", answer = null;
+
+        if (type.equals("FC") || type.equals("SA") || type.equals("TF")) {
+            // Randomly choose question and answer
+            double choice = Math.random();
+
+            if (type.equals("FC")) {
+                if (choice < 0.5) {
+                    // Stick with original question and answer
+                    question = ret.get(i).getString("Q");
+                    answer = ret.get(i).getString("A");
+                } else {
+                    // Reverse Q and A
+                    answer = ret.get(i).getString("Q");
+                    question = ret.get(i).getString("A");
+                }
+            } else {
+                question = ret.get(i).getString("Q");
+                answer = ret.get(i).getString("A");
+            }
+
+            // Create question object and add
+            FlashCard fc = new FlashCard("GeneralKnowledge", id, question, answer, score, date, subclass, topic);
+            if (type.equals("TF")) {
+                fc.trueFalse = true;
+                fc.question = "True or False: " + fc.question;
+            }
+            Control.questions.add(fc);
+
+            // Type = multiple choice or OR
+        } else {
+            ArrayList<String> answerChoices = null;
+            answer = ret.get(i).getString("A");
+
+            if (type.equals("OR")) {
+                answerChoices = new ArrayList<String>(2);
+                String[] q = ret.get(i).getString("Q").split(" ");
+                for (int j = 0; j < q.length; j++) {
+                    if (q[j].contains("OR")) {
+                        String[] qs = q[j].split("OR");
+                        answerChoices.add(qs[0]);
+                        answerChoices.add(qs[1]);
+                        question += "__________";
+                    } else {
+                        question += q[j];
+                    }
+
+                    if (j < q.length - 1) {
+                        question += " ";
+                    } else {
+                        question += ".";
+                    }
+                }
+
+                Log.d("ASH", "question = " + question);
+            } else {
+                question = ret.get(i).getString("Q");
+                answerChoices = new ArrayList<String>(4);
+                answerChoices.add(answer);
+
+                // query answer choices for specific MC type if not already saved
+                if (!allAnswerChoices.containsKey(type)) {
+                    ParseQuery<ParseObject> choicesQuery = ParseQuery.getQuery("GeneralKnowledge");
+                    choicesQuery.orderByAscending("Score");
+                    choicesQuery.whereEqualTo("Type", type);
+
+                    List<ParseObject> choicesRet = choicesQuery.find();
+                    ArrayList<String> choicesToAdd = new ArrayList<String>(choicesRet.size());
+                    for (int j = 0; j < choicesRet.size(); j++) {
+                        String choice = choicesRet.get(j).getString("A");
+                        choicesToAdd.add(choice);
+                    }
+
+                    allAnswerChoices.put(type, choicesToAdd);
+                }
+
+                // Get list of all possible answer choices for specific MC type
+                ArrayList<String> allChoices = allAnswerChoices.get(type);
+
+                // If list is too small, add all of them (except for duplicate) and for "No choices left" for the rest
+                if (allChoices.size() < 5) {
+                    for (int j = 0; j < allChoices.size(); j++) {
+                        if (!allChoices.get(j).equals(answer)) {
+                            answerChoices.add(allChoices.get(j));
+                        }
+                    }
+
+                    if (answerChoices.size() < 4) {
+                        for (int j = answerChoices.size(); j < 4; j++) {
+                            answerChoices.add("No choices left!");
+                        }
+                    }
+                    // If the list is not too small, select 3 non-duplicate choices randomly
+                } else {
+                    for (int index = 1; index < 4; index++) {
+                        int val = -1;
+                        do {
+                            val = (int) (Math.random() * allChoices.size());
+                        } while (answerChoices.contains(allChoices.get(val)));
+                        answerChoices.add(allChoices.get(val));
+                    }
+                }
+
+                Collections.shuffle(answerChoices);
+                Collections.shuffle(answerChoices);
+            }
+
+            // Create question object and add
+            MultipleChoice mc = new MultipleChoice("GeneralKnowledge", id, question, answer, answerChoices, score, date, subclass, topic);
+            Control.questions.add(mc);
+        }
+
+    }
 }

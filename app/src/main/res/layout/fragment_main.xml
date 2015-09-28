@@ -26,11 +26,13 @@
             android:text="@string/main_quizme"/>
 
         <Button
+            android:id="@+id/Button_daily"
+            android:onClick="dailyQuestions"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/Main_quizMeButton"
-            android:text="@string/main_progress"/>
+            android:text="Daily Questions"/>
 
     </RelativeLayout>
 

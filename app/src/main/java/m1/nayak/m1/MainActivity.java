@@ -35,7 +35,7 @@ import m1.nayak.m1.objects.Question;
 // TODO: Change button name based on what is checked. If General Knowledge is checked, name is "Next", if not, name is "Start Quiz"
 // TODO: Add settings page for following parameters: quiz length, smart quizzing, flash card grading
 
-public class MainActivity extends ActionBarActivity implements FilterFragment.OnFragmentInteractionListener, ResultsFragment.OnFragmentInteractionListener, QuizConfigureFragment.OnFragmentInteractionListener, QuizChoiceFragment.OnFragmentInteractionListener, QuizQuestionFragment.OnFragmentInteractionListener {
+public class MainActivity extends ActionBarActivity implements DailyFragment.OnFragmentInteractionListener, FilterFragment.OnFragmentInteractionListener, ResultsFragment.OnFragmentInteractionListener, QuizConfigureFragment.OnFragmentInteractionListener, QuizChoiceFragment.OnFragmentInteractionListener, QuizQuestionFragment.OnFragmentInteractionListener {
 
     public String fragmentLevel;
     public boolean fragmentMC;
@@ -171,6 +171,9 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
                 fragmentLevel = "class";
                 fragmentMC = true;
                 break;
+            // Daily question
+            case 7:
+                fragment = new DailyFragment();
             default:
                 break;
         }
@@ -334,6 +337,12 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
         }
     }
 
+    @Override
+    public void onDailyQuestionsStarted(int numQuestions, int percentageCurrent) {
+        String[] data = {""+numQuestions, ""+percentageCurrent};
+        new DailyQuestions().execute(data);
+    }
+
     public static class PlaceholderFragment extends Fragment {
 
         public PlaceholderFragment() {
@@ -353,10 +362,50 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
         displayView(4, true);
     }
 
+    public void dailyQuestions(View view) {
+        displayView(7, true);
+    }
+
+    class DailyQuestions extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog = new ProgressDialog(MainActivity.this);
+            dialog.setMessage("Creating quiz ...");
+            dialog.setIndeterminate(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        protected String doInBackground(String... args) {
+            try {
+                Query.getDailyQuestions(args);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            dialog.dismiss();
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (Control.questions.size() > 0) {
+                        curr = 0;
+                        displayView(2, true);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No questions found!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    }
+
     class GetQuestions extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            dialog = new ProgressDialog(MainActivity.this);
             dialog.setMessage("Creating quiz ...");
             dialog.setIndeterminate(false);
             dialog.setCancelable(false);
@@ -403,6 +452,7 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            dialog = new ProgressDialog(MainActivity.this);
             dialog.setMessage("Updating ...");
             dialog.setIndeterminate(false);
             dialog.setCancelable(false);
@@ -429,6 +479,7 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            dialog = new ProgressDialog(MainActivity.this);
             dialog.setMessage("Uploading results ...");
             dialog.setIndeterminate(false);
             dialog.setCancelable(false);
@@ -484,7 +535,6 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
             dialog = new ProgressDialog(MainActivity.this);
             dialog.setMessage("Loading...");
             dialog.setIndeterminate(false);
