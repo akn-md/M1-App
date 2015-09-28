@@ -11,6 +11,8 @@ import m1.nayak.m1.objects.Subject;
  */
 public class Control {
 
+    public static String user;
+
     public static boolean subClassesLoaded = false;
 
     public static ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
@@ -25,6 +27,9 @@ public class Control {
     public static HashMap<String, Double> subClassScores = new HashMap<String, Double>();
     public static HashMap<String, Double> topicScores = new HashMap<String, Double>();
 
+    // for question updates
+    public static double updateIncrement = 0.75;
+    public static double minScore;
 
 
 }

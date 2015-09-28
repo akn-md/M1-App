@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import m1.nayak.m1.objects.FlashCard;
 import m1.nayak.m1.objects.MultipleChoice;
@@ -163,16 +164,25 @@ public class QuizQuestionFragment extends Fragment {
             answer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // add bullet points
+                    if (q.answer.contains(";")) {
+                        String answer = "";
+                        String[] parts = q.answer.split(";");
+                        for(String s:parts) {
+                            answer += "• " + s + "\n";
+                        }
+                        q.answer=answer;
+                    }
                     // add boldness
                     if (q.answer.contains("*")) {
                         String a = "";
 
                         String[] parts = q.answer.split("\\*");
 
-                        for(int i = 0; i < parts.length; i++) {
+                        for (int i = 0; i < parts.length; i++) {
                             a += parts[i];
                             i++;
-                            if(i<parts.length) a+= "<b>" + parts[i] + "</b>";
+                            if (i < parts.length) a += "<b>" + parts[i] + "</b>";
                         }
 
                         answer.setText(Html.fromHtml(a));
@@ -322,7 +332,7 @@ public class QuizQuestionFragment extends Fragment {
         one.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                q.score = 1;
+                updateScore(1);
                 boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
                 mListener.onNextPressed(currQuestion, lastQuestion, 1);
             }
@@ -331,7 +341,7 @@ public class QuizQuestionFragment extends Fragment {
         two.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                q.score = 2;
+                updateScore(2);
                 boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
                 mListener.onNextPressed(currQuestion, lastQuestion, 2);
             }
@@ -340,7 +350,7 @@ public class QuizQuestionFragment extends Fragment {
         three.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                q.score = 3;
+                updateScore(3);
                 boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
                 mListener.onNextPressed(currQuestion, lastQuestion, 3);
             }
@@ -349,7 +359,7 @@ public class QuizQuestionFragment extends Fragment {
         four.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                q.score = 4;
+                updateScore(4);
                 boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
                 mListener.onNextPressed(currQuestion, lastQuestion, 4);
             }
@@ -358,13 +368,29 @@ public class QuizQuestionFragment extends Fragment {
         five.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                q.score = 5;
+                updateScore(5);
                 boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
                 mListener.onNextPressed(currQuestion, lastQuestion, 5);
             }
         });
 
         return rootView;
+    }
+
+    public void updateScore(double update) {
+
+        double score = q.score;
+
+        if (update < score) {
+            q.score = update;
+        } else {
+            double diff = update - score;
+            double increment = diff * Control.updateIncrement;
+            score += increment;
+            q.score = score;
+        }
+
+        Toast.makeText(getActivity(), "Updated score = " + q.score, Toast.LENGTH_SHORT).show();
     }
 
     @Override

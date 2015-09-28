@@ -1,17 +1,21 @@
 package m1.nayak.m1;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +45,13 @@ public class FilterFragment extends Fragment {
     // progress
     ProgressBar progress;
 
+    // item data
+    Dialog dialog;
+    ToggleButton tButton;
+    CheckBox resetScores;
+    Button saveChanges;
+    String currItem;
+
     public static FilterFragment newInstance(String param1, String param2) {
         FilterFragment fragment = new FilterFragment();
         return fragment;
@@ -61,22 +72,71 @@ public class FilterFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_filter, container, false);
 
+        dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_list_item);
+        dialog.setCancelable(true);
+        tButton = (ToggleButton) dialog.findViewById(R.id.TB_materialType);
+        resetScores = (CheckBox) dialog.findViewById(R.id.CheckBox_resetScores);
+        saveChanges = (Button) dialog.findViewById(R.id.Button_confrimCategoryChanges);
+
+        saveChanges.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mode == 2) {
+                    for (int i = 0; i < Control.subclasses.size(); i++) {
+                        if (Control.subclasses.get(i).className.equals(currItem)) {
+                            if (tButton.isChecked()) {
+                                Control.subclasses.get(i).current = true;
+                            } else {
+                                Control.subclasses.get(i).current = false;
+                            }
+                        }
+                    }
+                }
+                mListener.updateCategory(mode, currItem, resetScores.isChecked(), tButton.isChecked());
+                dialog.dismiss();
+            }
+        });
+
         // Expandable list view
         chooseClassesList = (ListView) rootView.findViewById(R.id.ListView_chooseClasses);
-        chooseClassesList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//        chooseClassesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                if(chooseClassesList.isItemChecked(position)) {
-//                    Log.d("ASH","is checked");
-//                    view.setSelected(true);
-//
-//                } else {
-//                    Log.d("ASH","is NOT checked");
-//                    view.setSelected(false);
-//                }
-//            }
-//        });
+        chooseClassesList.setLongClickable(true);
+        chooseClassesList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                switch (mode) {
+                    case 1:
+                        currItem = classes.get(position);
+                        tButton.setVisibility(View.INVISIBLE);
+                        break;
+                    case 2:
+                        currItem = subclasses.get(position);
+                        tButton.setVisibility(View.VISIBLE);
+                        for (int i = 0; i < Control.subclasses.size(); i++) {
+                            if (Control.subclasses.get(i).className.equals(currItem)) {
+                                if (Control.subclasses.get(i).current) {
+                                    tButton.setChecked(true);
+                                } else {
+                                    tButton.setChecked(false);
+                                }
+                            }
+                        }
+                        break;
+                    case 3:
+                        currItem = topics.get(position);
+                        tButton.setVisibility(View.INVISIBLE);
+                        break;
+                    default:
+                        break;
+                }
+                Toast.makeText(getActivity(), currItem, Toast.LENGTH_SHORT).show();
+                dialog.setTitle(currItem);
+                dialog.show();
+                return true;
+            }
+        });
+
 
         progress = (ProgressBar) rootView.findViewById(R.id.Progress_filterProgress);
 
@@ -107,7 +167,7 @@ public class FilterFragment extends Fragment {
                         subclasses = new ArrayList<String>();
 
                         for (int i = 0; i < Control.classes.size(); i++) {
-                            if (Control.selectedItems[i]) {
+                            if (chooseClassesList.isItemChecked(i)) {
                                 chosenClasses.add(Control.classes.get(i).className);
                                 for (int j = 0; j < Control.classes.get(i).subclasses.size(); j++) {
                                     subclasses.add(Control.classes.get(i).subclasses.get(j));
@@ -128,7 +188,7 @@ public class FilterFragment extends Fragment {
                         topics = new ArrayList<String>();
 
                         for (int i = 0; i < subclasses.size(); i++) {
-                            if (Control.selectedItems[i]) {
+                            if (chooseClassesList.isItemChecked(i)) {
                                 chosenSubclasses.add(subclasses.get(i));
                             }
                         }
@@ -154,7 +214,7 @@ public class FilterFragment extends Fragment {
                         chosenTopics = new ArrayList<String>();
 
                         for (int i = 0; i < topics.size(); i++) {
-                            if (Control.selectedItems[i]) {
+                            if (chooseClassesList.isItemChecked(i)) {
                                 chosenTopics.add(topics.get(i));
                             }
                         }
@@ -203,15 +263,11 @@ public class FilterFragment extends Fragment {
                 // Show classes
                 classes = new ArrayList<String>(Control.classes.size());
                 for (int i = 0; i < Control.classes.size(); i++) {
-//                    classes.add(Control.classes.get(i).className + " (" + Control.classes.get(i).count + " questions)");
                     classes.add(Control.classes.get(i).className);
                 }
 
                 Collections.sort(classes);
-//                chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, classes);
-//                chooseClassesList.setAdapter(chooseClassesListAdapter);
-
-                adapter = new FilterAdapter(getActivity(), classes, null);
+                adapter = new FilterAdapter(getActivity(), classes, null, 1);
                 chooseClassesList.setAdapter(adapter);
 
                 // set progress bar
@@ -231,21 +287,8 @@ public class FilterFragment extends Fragment {
 
                 break;
             case 2:
-                ArrayList<String> temp = new ArrayList<String>();
-                // Get question counts for subclasses
-                for (int i = 0; i < Control.subclasses.size(); i++) {
-                    String scName = Control.subclasses.get(i).className;
-                    if (subclasses.contains(scName)) {
-                        temp.add(scName + " (" + Control.subclasses.get(i).count + " questions)");
-                    }
-                }
-
                 Collections.sort(subclasses);
-                Collections.sort(temp);
-
-//                chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, temp);
-//                chooseClassesList.setAdapter(chooseClassesListAdapter);
-                adapter = new FilterAdapter(getActivity(), subclasses, null);
+                adapter = new FilterAdapter(getActivity(), subclasses, null, 2);
                 chooseClassesList.setAdapter(adapter);
                 next.setText("Next");
 
@@ -259,7 +302,7 @@ public class FilterFragment extends Fragment {
 //                score *= 100;
 //
                 score = 0.0;
-                for(int i = 0; i < chosenClasses.size(); i++) {
+                for (int i = 0; i < chosenClasses.size(); i++) {
                     score += Control.classScores.get(chosenClasses.get(i));
                 }
 
@@ -278,7 +321,7 @@ public class FilterFragment extends Fragment {
                 Collections.sort(topics);
 //                chooseClassesListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, topics);
 //                chooseClassesList.setAdapter(chooseClassesListAdapter);
-                adapter = new FilterAdapter(getActivity(), topics, null);
+                adapter = new FilterAdapter(getActivity(), topics, null, 3);
                 chooseClassesList.setAdapter(adapter);
                 next.setText("Start Quiz");
                 break;
@@ -293,5 +336,7 @@ public class FilterFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         public void onQuizFiltered(ArrayList<String> chosenClasses, ArrayList<String> chosenSubclasses, ArrayList<String> chosenTopics);
+
+        public void updateCategory(int mode, String category, boolean reset, boolean current);
     }
 }

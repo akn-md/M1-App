@@ -1,6 +1,8 @@
 package m1.nayak.m1;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -16,6 +18,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
@@ -38,19 +43,21 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
     // for AsyncTasks
     ProgressDialog dialog;
 
+    // for username
+    Dialog userDialog;
+    private EditText username;
+    private Button confirmUser;
+
     // quiz parameters
     ArrayList<String> chosenClasses;
     ArrayList<String> chosenSubclasses;
     ArrayList<String> chosenTopics;
-    ArrayList<String> chosenCategories;
-    boolean smartQuiz;
+    int mode;
 
     // quiz navigation
     int curr;
 
     ActionBar actionBar;
-
-
 
 
     @Override
@@ -71,6 +78,43 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
         actionBar = getSupportActionBar();
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#1abc9c")));
+
+        userDialog = new Dialog(this);
+        userDialog.setContentView(R.layout.dialog_user);
+        username = (EditText) userDialog.findViewById(R.id.UserDialog_ET1);
+        confirmUser = (Button) userDialog.findViewById(R.id.UserDialog_confirm);
+        confirmUser.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String user = username.getText().toString().trim();
+                if (user.length() > 0) {
+                    Control.user = user;
+
+                    // save user
+                    SharedPreferences fields = getPreferences(0);
+                    SharedPreferences.Editor editor = fields.edit();
+                    editor.putString("user", user);
+
+                    userDialog.dismiss();
+                    editor.commit();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Please specify a username", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        userDialog.setCancelable(false);
+        userDialog.setTitle("Who are you?");
+
+        if (Control.user == null)
+            userDialog.show();
+
+        // load user
+        SharedPreferences fields = getPreferences(0);
+        if (fields.contains("user")) {
+            username.setText(fields.getString("user", ""));
+        }
     }
 
     @Override
@@ -182,13 +226,18 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
 
     @Override
-    public void onQuizConfigured(ArrayList<String> categories, boolean smart) {
-        chosenCategories = categories;
-        smartQuiz = smart;
+    public void onQuizConfigured(int option) {
+//        chosenCategories = categories;
+//        smartQuiz = smart;
+//
+//        // TODO: Only show view 4 (class filters) if General Knowledge category is checked, otherwise start quiz
 
-        // TODO: Only show view 4 (class filters) if General Knowledge category is checked, otherwise start quiz
 
-        displayView(4, true);
+//        displayView(4, true);
+
+        mode = option;
+        dialog = new ProgressDialog(this);
+        new GetQuestions().execute();
     }
 
     @Override
@@ -252,18 +301,26 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 //
 //        Log.d("ASH", "Smart quiz = " + smartQuiz);
 
-        dialog = new ProgressDialog(this);
-        new GetQuestions().execute();
+        displayView(1, true);
+
+//        dialog = new ProgressDialog(this);
+//        new GetQuestions().execute();
+    }
+
+    @Override
+    public void updateCategory(int mode, String category, boolean reset, boolean current) {
+        String[] data = {""+mode, category, String.valueOf(reset), String.valueOf(current)};
+        new UpdateCategory().execute(data);
     }
 
     public void updateScores() {
         // TODO: factor time into score update
 
-        for(int i = 0; i < Control.questions.size(); i++) {
+        for (int i = 0; i < Control.questions.size(); i++) {
             Question q = Control.questions.get(i);
-            int score = q.score;
+            double score = q.score;
 
-            if(q.answeredCorrectly) {
+            if (q.answeredCorrectly) {
                 score += 20;
                 if (score > 100)
                     score = 100;
@@ -308,7 +365,8 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 
         protected String doInBackground(String... args) {
             try {
-                Query.getData(chosenSubclasses, chosenTopics, chosenCategories, smartQuiz);
+//                Query.getData(chosenSubclasses, chosenTopics, chosenCategories, mode);
+                Query.getGKQuestions(chosenSubclasses, chosenTopics, mode);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -328,10 +386,41 @@ public class MainActivity extends ActionBarActivity implements FilterFragment.On
 //                        i.putExtra("numQuestions", Control.questions.size());
 //                        startActivity(i);
 //                    }
-                    curr = 0;
-                    displayView(2, true);
+
+                    if(Control.questions.size() > 0) {
+                        curr = 0;
+                        displayView(2, true);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No questions found!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
+        }
+    }
+
+    class UpdateCategory extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setMessage("Updating ...");
+            dialog.setIndeterminate(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Update.updateCategory(params);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            dialog.dismiss();
         }
     }
 

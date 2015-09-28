@@ -78,7 +78,7 @@ public class ResultsFragment extends Fragment {
     public void getResults() {
         HashMap<String, Integer> correct = new HashMap<String, Integer>();
         HashMap<String, Integer> total = new HashMap<String, Integer>();
-        HashMap<String, Integer> score = new HashMap<String, Integer>();
+        HashMap<String, Double> score = new HashMap<String, Double>();
 
         for (int i = 0; i < Control.questions.size(); i++) {
             Log.d("ASH", "-----");

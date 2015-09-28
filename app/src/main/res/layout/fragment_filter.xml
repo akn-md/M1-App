@@ -45,6 +45,8 @@
         android:layout_height="wrap_content"/>
 
     <ListView
+        android:listSelector="@drawable/list_selector"
+        android:choiceMode="multipleChoice"
         android:layout_marginLeft="100dp"
         android:layout_marginRight="100dp"
         android:padding="15dp"

@@ -13,59 +13,11 @@
         android:orientation="vertical"
         android:id="@+id/linearLayout">
 
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="General Knowledge"
-            android:id="@+id/CheckBox_GeneralKnowledge" />
-
         <TextView
             android:layout_width="fill_parent"
-            android:text="Straight from First Aid and lectures, in both flash card and multiple choice formats, with some clinical stuff sprinkled in"
-            android:layout_height="wrap_content"/>
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Diseases"
-            android:id="@+id/CheckBox_Diseases"/>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:text="Test your knowledge of diseases, with everything from pathophysiology to symptoms and treatments"
-            android:layout_height="wrap_content"/>
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Enzymes"
-            android:id="@+id/CheckBox_Enzymes"/>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:text="Focuses on enzymes of important metabolic pathways, along with their activators, inhibitors, and co-factors"
-            android:layout_height="wrap_content"/>
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Drugs"
-            android:id="@+id/CheckBox_Drugs"/>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:text="Do you know your drugs? Test your knowledge on drug actions and treatment uses"
-            android:layout_height="wrap_content"/>
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hormones"
-            android:id="@+id/CheckBox_Hormones"/>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:text="Hormones can be confusing, so they get their own category"
+            android:text="Choose quiz mode"
+            android:textColor="#000000"
+            android:textSize="25sp"
             android:layout_height="wrap_content"/>
 
         <View
@@ -74,15 +26,40 @@
             android:layout_height="2dp"
             android:background="#000000" />
 
-        <CheckBox
+        <RadioGroup
+            android:id="@+id/RG_options"
+            android:padding="10dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Quiz me where I'm weak"
-            android:id="@+id/CheckBox_smartQuizzing"/>
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/RB_learning"
+                android:text="Learning Mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <RadioButton
+                android:id="@+id/RB_review"
+                android:text="Review All"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <RadioButton
+                android:id="@+id/RB_focused"
+                android:text="Focused Review"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </RadioGroup>
 
         <TextView
-            android:layout_width="fill_parent"
-            android:text="If checked, questions will either be generated from the topics you have low accuracies on or ones you haven't seen in a while"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Review all questions with score under:"/>
+
+        <EditText
+            android:inputType="numberDecimal"
+            android:id="@+id/EditText_minimumScore"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
         <View
@@ -92,11 +69,97 @@
             android:background="#000000" />
 
         <Button
-            android:layout_width="fill_parent"
-            android:layout_margin="10dp"
-            android:layout_height="wrap_content"
-            android:text="Next"
-            android:id="@+id/Button_startQuiz"
-            android:layout_alignParentBottom="true"/>
+        android:layout_width="fill_parent"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:text="Start Quiz"
+        android:id="@+id/Button_startQuiz"
+        android:layout_alignParentBottom="true"/>
+
+        <!--<CheckBox-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="General Knowledge"-->
+            <!--android:id="@+id/CheckBox_GeneralKnowledge" />-->
+
+        <!--<TextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:text="Straight from First Aid and lectures, in both flash card and multiple choice formats, with some clinical stuff sprinkled in"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+        <!--<CheckBox-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Diseases"-->
+            <!--android:id="@+id/CheckBox_Diseases"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:text="Test your knowledge of diseases, with everything from pathophysiology to symptoms and treatments"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+        <!--<CheckBox-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Enzymes"-->
+            <!--android:id="@+id/CheckBox_Enzymes"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:text="Focuses on enzymes of important metabolic pathways, along with their activators, inhibitors, and co-factors"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+        <!--<CheckBox-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Drugs"-->
+            <!--android:id="@+id/CheckBox_Drugs"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:text="Do you know your drugs? Test your knowledge on drug actions and treatment uses"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+        <!--<CheckBox-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Hormones"-->
+            <!--android:id="@+id/CheckBox_Hormones"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:text="Hormones can be confusing, so they get their own category"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+        <!--<View-->
+            <!--android:layout_marginTop="10dp"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="2dp"-->
+            <!--android:background="#000000" />-->
+
+        <!--<CheckBox-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Quiz me where I'm weak"-->
+            <!--android:id="@+id/CheckBox_smartQuizzing"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:text="If checked, questions will either be generated from the topics you have low accuracies on or ones you haven't seen in a while"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+        <!--<View-->
+            <!--android:layout_marginTop="10dp"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="2dp"-->
+            <!--android:background="#000000" />-->
+
+        <!--<Button-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Next"-->
+            <!--android:id="@+id/Button_startQuiz"-->
+            <!--android:layout_alignParentBottom="true"/>-->
     </LinearLayout>
 </ScrollView>

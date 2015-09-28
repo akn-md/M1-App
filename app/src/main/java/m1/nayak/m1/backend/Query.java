@@ -33,7 +33,7 @@ public class Query {
 
     // TODO: Subclasses will be null if GK is not a category. Determine how many questions to draw from each category and filter accordingly.
     // TODO: Actually filter by category
-    public static void getData(ArrayList<String> subClasses, ArrayList<String> topics, ArrayList<String> categories, boolean smart) throws ParseException {
+    public static void getData(ArrayList<String> subClasses, ArrayList<String> topics, ArrayList<String> categories, int mode) throws ParseException {
 //        String entity = "EnzymeTest";
 //        ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);
 //        query.addAscendingOrder(entity);
@@ -61,14 +61,14 @@ public class Query {
 //            e1.printStackTrace();
 //        }
 
-        getGKQuestions(20, subClasses, topics);
+//        getGKQuestions(20, subClasses, topics);
 //        getEnzymeQuestions(true, 2);
 
         // shuffle questions
 //        Collections.shuffle(Control.questions);
     }
 
-    public static void getGKQuestions(int count, ArrayList<String> subClasses, ArrayList<String> topics) {
+    public static void getGKQuestions(ArrayList<String> subClasses, ArrayList<String> topics, int mode) throws ParseException {
         HashMap<String, ArrayList<String>> allAnswerChoices = new HashMap<String, ArrayList<String>>();
 
         String entity = "GeneralKnowledge";
@@ -76,7 +76,13 @@ public class Query {
 
         query.whereContainedIn("Subclass", subClasses);
         query.whereContainedIn("Topic", topics);
-        query.orderByAscending("Score");
+        query.orderByAscending("createdAt");
+
+        if(mode == 3) {
+            query.whereLessThan("Score_" + Control.user, Control.minScore);
+        }
+
+//        query.orderByAscending("Score");
 //        query.setLimit(count);
 
         List<ParseObject> ret = null;
@@ -91,7 +97,7 @@ public class Query {
             for (int i = 0; i < ret.size(); i++) {
                 // get id, score and date
                 String id = ret.get(i).getObjectId();
-                int score = ret.get(i).getInt("Score");
+                double score = ret.get(i).getDouble("Score_" + Control.user);
                 Date date = ret.get(i).getUpdatedAt();
                 String type = ret.get(i).getString("Type");
                 String hint = ret.get(i).getString("Hint");
@@ -208,6 +214,10 @@ public class Query {
                     MultipleChoice mc = new MultipleChoice(entity, id, question, answer, answerChoices, score, date, subclass, topic);
                     Control.questions.add(mc);
                 }
+            }
+
+            if(mode != 1) {
+                Collections.shuffle(Control.questions);
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -348,32 +358,32 @@ public class Query {
                 ParseQuery<ParseObject> gcQuery = ParseQuery.getQuery(getCount);
                 gcQuery.whereEqualTo("Class", s);
                 sub.count = gcQuery.count();
-                gcQuery.whereEqualTo("Score", 1);
+                gcQuery.whereEqualTo("Score_" + Control.user, 1);
                 double ones = gcQuery.count();
 //                Log.d("Parse", sub.count + " questions in Class " + s);
 //                Log.d("Parse", ones + " with score=1 in Class " + s);
 
                 ParseQuery.getQuery(getCount);
                 gcQuery.whereEqualTo("Class", s);
-                gcQuery.whereEqualTo("Score", 2);
+                gcQuery.whereEqualTo("Score_" + Control.user, 2);
                 double twos = gcQuery.count();
 //                Log.d("Parse", twos + " with score=2 in Class " + s);
 
                 ParseQuery.getQuery(getCount);
                 gcQuery.whereEqualTo("Class", s);
-                gcQuery.whereEqualTo("Score", 3);
+                gcQuery.whereEqualTo("Score_" + Control.user, 3);
                 double threes = gcQuery.count();
 //                Log.d("Parse", threes + " with score=3 in Class " + s);
 
                 ParseQuery.getQuery(getCount);
                 gcQuery.whereEqualTo("Class", s);
-                gcQuery.whereEqualTo("Score", 4);
+                gcQuery.whereEqualTo("Score_" + Control.user, 4);
                 double fours = gcQuery.count();
 //                Log.d("Parse", fours + " with score=4 in Class " + s);
 
                 ParseQuery.getQuery(getCount);
                 gcQuery.whereEqualTo("Class", s);
-                gcQuery.whereEqualTo("Score", 5);
+                gcQuery.whereEqualTo("Score_" + Control.user, 5);
                 double fives = gcQuery.count();
 //                Log.d("Parse", fives + " with score=5 in Class " + s);
 
@@ -410,6 +420,7 @@ public class Query {
             for (int i = 0; i < ret.size(); i++) {
                 String s = ret.get(i).getString(entity);
                 JSONArray tops = ret.get(i).getJSONArray("Topics");
+                boolean current = ret.get(i).getBoolean("isCurrentMaterial");
 
                 ArrayList<String> topics = new ArrayList<String>(tops.length());
                 for (int j = 0; j < tops.length(); j++) {
@@ -417,6 +428,7 @@ public class Query {
                 }
                 Collections.sort(topics);
                 Subject sub = new Subject(s, topics);
+                sub.current = current;
 
                 String getCount = "GeneralKnowledge";
                 ParseQuery<ParseObject> gcQuery = ParseQuery.getQuery(getCount);

@@ -13,7 +13,7 @@ public abstract class Question {
     public String question;
     public String answer;
 
-    public int score;
+    public double score;
     public Date lastAsked;
 
     public boolean answered;
@@ -21,7 +21,7 @@ public abstract class Question {
 
     public String subject, topic;
 
-    public Question(String e, String i, String q, String a, int s, Date last, String sub, String top) {
+    public Question(String e, String i, String q, String a, double s, Date last, String sub, String top) {
         entity = e;
         id = i;
         question = q;
