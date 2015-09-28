@@ -266,6 +266,10 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
     }
 
     @Override
+    public void onQuestionEdited() {
+        new UpdateQuestion().execute();
+    }
+    @Override
     public void onResultsClosed(boolean save) {
         if (save) {
             new UploadResults().execute();
@@ -463,6 +467,33 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
         protected String doInBackground(String... params) {
             try {
                 Update.updateCategory(params);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            dialog.dismiss();
+        }
+    }
+
+    class UpdateQuestion extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog = new ProgressDialog(MainActivity.this);
+            dialog.setMessage("Updating ...");
+            dialog.setIndeterminate(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Update.updateQuestion();
             } catch (ParseException e) {
                 e.printStackTrace();
             }

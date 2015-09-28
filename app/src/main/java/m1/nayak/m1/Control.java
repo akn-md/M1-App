@@ -30,6 +30,8 @@ public class Control {
     // for question updates
     public static double updateIncrement = 0.75;
     public static double minScore;
+    public static Question update;
+
 
 
 }

@@ -1,22 +1,29 @@
 package m1.nayak.m1;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import m1.nayak.m1.objects.FlashCard;
 import m1.nayak.m1.objects.MultipleChoice;
@@ -41,6 +48,14 @@ public class QuizQuestionFragment extends Fragment {
     ImageView feedbackImage;
     LinearLayout ratingRow;
     Button one, two, three, four, five;
+
+    // Edit question
+    ImageView edit;
+    Dialog dialog;
+    EditText editQuestion, editAnswer, editType, editScore, editAuthor;
+    Spinner editClass, editSubclass, editTopic;
+    ArrayAdapter<CharSequence> classAdapter, subClassAdapter, topicAdapter;
+    Button saveChanges;
 
     // FC feedback
 //    ImageView thumbsUp, thumbsDown;
@@ -97,6 +112,92 @@ public class QuizQuestionFragment extends Fragment {
         // Question
         question = (TextView) rootView.findViewById(R.id.TextView_question);
         question.setText(q.question);
+
+        // Edit question
+        edit = (ImageView) rootView.findViewById(R.id.ImageView_editQuestion);
+        dialog = new Dialog(getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_edit_question);
+        dialog.setCancelable(true);
+        dialog.setTitle("Edit question");
+        editQuestion = (EditText) dialog.findViewById(R.id.EditText_question);
+        editAnswer = (EditText) dialog.findViewById(R.id.EditText_answer);
+        editType = (EditText) dialog.findViewById(R.id.EditText_type);
+        editScore = (EditText) dialog.findViewById(R.id.EditText_score);
+        editAuthor = (EditText) dialog.findViewById(R.id.EditText_author);
+        editClass = (Spinner) dialog.findViewById(R.id.Spinner_class);
+        editSubclass = (Spinner) dialog.findViewById(R.id.Spinner_subclass);
+        editTopic = (Spinner) dialog.findViewById(R.id.Spinner_topic);
+        saveChanges = (Button) dialog.findViewById(R.id.Button_saveChanges);
+
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editQuestion.setText(q.question);
+                editAnswer.setText(q.answer);
+                editType.setText(q.type);
+                editScore.setText("" + q.score);
+                editAuthor.setText(q.author);
+
+                String[] classes = new String[Control.classes.size()];
+                int index = 0;
+                for (int i = 0; i < Control.classes.size(); i++) {
+                    classes[i] = Control.classes.get(i).className;
+                    if (classes[i].equals(q.className))
+                        index = i;
+                }
+                classAdapter = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_dropdown_item, classes);
+                editClass.setAdapter(classAdapter);
+                editClass.setSelection(index);
+
+                ArrayList<String> topics = new ArrayList<String>();
+                String[] subs = new String[Control.subclasses.size()];
+                index = 0;
+                for (int i = 0; i < Control.subclasses.size(); i++) {
+                    subs[i] = Control.subclasses.get(i).className;
+                    for (int j = 0; j < Control.subclasses.get(i).subclasses.size(); j++) {
+                        topics.add(Control.subclasses.get(i).subclasses.get(j));
+                    }
+                    if (subs[i].equals(q.subject))
+                        index = i;
+                }
+                subClassAdapter = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_dropdown_item, subs);
+                editSubclass.setAdapter(subClassAdapter);
+                editSubclass.setSelection(index);
+
+                String[] tops = new String[topics.size()];
+                index = 0;
+                for (int i = 0; i < topics.size(); i++) {
+                    tops[i] = topics.get(i);
+                    if (tops[i].equals(q.topic))
+                        index = i;
+                }
+                topicAdapter = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_spinner_dropdown_item, tops);
+                editTopic.setAdapter(topicAdapter);
+                editTopic.setSelection(index);
+
+                dialog.show();
+            }
+        });
+
+        saveChanges.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                q.question = editQuestion.getText().toString();
+                q.answer = editAnswer.getText().toString();
+                q.type = editType.getText().toString();
+                q.score = Double.parseDouble(editScore.getText().toString());
+                q.className = editClass.getSelectedItem().toString();
+                q.subject = editSubclass.getSelectedItem().toString();
+                q.topic = editTopic.getSelectedItem().toString();
+                q.author = editAuthor.getText().toString();
+
+                Log.d("ASH", q.question + "," + q.answer + "," + q.type + "," + q.score + "," + q.className + "," + q.subject + "," + q.topic + "," + q.author);
+                Control.update = q;
+                mListener.onQuestionEdited();
+                dialog.dismiss();
+            }
+        });
 
         // feedback
         feedback = (TextView) rootView.findViewById(R.id.TextView_feedback);
@@ -168,10 +269,10 @@ public class QuizQuestionFragment extends Fragment {
                     if (q.answer.contains(";")) {
                         String answer = "";
                         String[] parts = q.answer.split(";");
-                        for(String s:parts) {
+                        for (String s : parts) {
                             answer += "• " + s + "\n";
                         }
-                        q.answer=answer;
+                        q.answer = answer;
                     }
                     // add boldness
                     if (q.answer.contains("*")) {
@@ -414,6 +515,8 @@ public class QuizQuestionFragment extends Fragment {
         public void onNextPressed(int curr, boolean lastQuestion, int rating);
 
         public void onPrevPressed(int curr);
+
+        public void onQuestionEdited();
     }
 
 }

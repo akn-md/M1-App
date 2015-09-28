@@ -11,16 +11,16 @@ public class ProcessData {
     }
 
     public static void processQuestions() {
-        String root = "/Users/Ashwin/Drive/Developer/Projects/M1/imports/M2/imports/PATH_9_17_15";
+        String root = "/Users/Ashwin/Drive/Developer/Projects/M1/imports/Imports/PATH_9_17_15";
 
         String pathToData = root + ".txt";
         String pathToDataJson = root + ".json";
 
-        String pathToClasses = "/Users/Ashwin/Drive/Developer/Projects/M1/classes.ser";
-        String pathToClassesJson = "/Users/Ashwin/Drive/Developer/Projects/M1/classes.json";
+        String pathToClasses = "/Users/Ashwin/Drive/Developer/Projects/M1/Class.ser";
+        String pathToClassesJson = "/Users/Ashwin/Drive/Developer/Projects/M1/Class.json";
 
-        String pathToSubClasses = "/Users/Ashwin/Drive/Developer/Projects/M1/subClasses.ser";
-        String pathToSubClassesJson = "/Users/Ashwin/Drive/Developer/Projects/M1/subClasses.json";
+        String pathToSubClasses = "/Users/Ashwin/Drive/Developer/Projects/M1/Subclass.ser";
+        String pathToSubClassesJson = "/Users/Ashwin/Drive/Developer/Projects/M1/Subclass.json";
 
         File f = new File(pathToClasses);
         File f1 = new File(pathToSubClasses);
@@ -65,12 +65,14 @@ public class ProcessData {
             }
 
             TextIO.putln("\"Class\": \"" + data[0] + "\",");
-            TextIO.putln("\"Q\": \"" + data[1] + "\",");
-            TextIO.putln("\"A\": \"" + data[2] + "\",");
-            TextIO.putln("\"Type\": \"" + data[3] + "\",");
-            TextIO.putln("\"Subclass\": \"" + data[4] + "\",");
-            TextIO.putln("\"Topic\": \"" + data[5] + "\",");
-            TextIO.putln("\"Score\": " + 0);
+            TextIO.putln("\"Author\": \"" + data[1] + "\",");
+            TextIO.putln("\"Q\": \"" + data[2] + "\",");
+            TextIO.putln("\"A\": \"" + data[3] + "\",");
+            TextIO.putln("\"Type\": \"" + data[4] + "\",");
+            TextIO.putln("\"Subclass\": \"" + data[5] + "\",");
+            TextIO.putln("\"Topic\": \"" + data[6] + "\",");
+            TextIO.putln("\"Score_Kristen\": " + 0 + ",");
+            TextIO.putln("\"Score_Ashwin\": " + 0);
 
 //            System.out.println("Class = " + data[0] + ", Subclass = " + data[4] + ", Topic = " + data[5]);
 
@@ -211,6 +213,7 @@ public class ProcessData {
 
             TextIO.putln("{");
             TextIO.putln("\"Subclass\": \"" + subClasses.get(i).className + "\",");
+            TextIO.putln("\"isCurrentMaterial\": \"" + true + "\",");
 
             TextIO.put("\"Topics\": [");
             for (int j = 0; j < subClasses.get(i).subclasses.size(); j++) {

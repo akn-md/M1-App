@@ -9,6 +9,7 @@ public abstract class Question {
 
     public String entity;
     public String id;
+    public String author;
 
     public String question;
     public String answer;
@@ -19,9 +20,13 @@ public abstract class Question {
     public boolean answered;
     public boolean answeredCorrectly;
 
-    public String subject, topic;
+    public String className, subject, topic;
 
-    public Question(String e, String i, String q, String a, double s, Date last, String sub, String top) {
+    public String type;
+
+    public Question(String auth, String c, String e, String i, String q, String a, double s, Date last, String sub, String top) {
+        author = auth;
+        className = c;
         entity = e;
         id = i;
         question = q;

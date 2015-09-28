@@ -36,6 +36,22 @@ public class Update {
 
     }
 
+    public static void updateQuestion() throws ParseException {
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(Control.update.entity);
+        ParseObject p = query.get(Control.update.id);
+
+        p.put("Score_" + Control.user, Control.update.score);
+        p.put("Q", Control.update.question);
+        p.put("A", Control.update.answer);
+        p.put("Class", Control.update.className);
+        p.put("Type", Control.update.type);
+        p.put("Subclass", Control.update.subject);
+        p.put("Topic", Control.update.topic);
+        p.put("Author", Control.update.author);
+        p.save();
+
+    }
     public static void updateCategory(String[] data) throws ParseException {
 
         int mode = Integer.parseInt(data[0]);
