@@ -251,9 +251,6 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
             curr++;
             displayView(2, true);
         } else {
-            // calculate new scores
-//            updateScores();
-
             // open quiz results page
             displayView(3, true);
         }
@@ -343,6 +340,7 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
 
     @Override
     public void onDailyQuestionsStarted(int numQuestions, int percentageCurrent) {
+        Control.quizMode = 4;
         String[] data = {""+numQuestions, ""+percentageCurrent};
         new DailyQuestions().execute(data);
     }

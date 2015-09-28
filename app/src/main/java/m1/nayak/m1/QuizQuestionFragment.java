@@ -65,7 +65,7 @@ public class QuizQuestionFragment extends Fragment {
     ProgressBar quizProgress;
 
     // navigation
-    ImageButton prev;
+    ImageButton prev, next;
 
     public static QuizQuestionFragment newInstance(boolean multi, int curr, int total) {
         QuizQuestionFragment fragment = new QuizQuestionFragment();
@@ -105,6 +105,7 @@ public class QuizQuestionFragment extends Fragment {
 
         // navigation
         prev = (ImageButton) rootView.findViewById(R.id.Button_quizPrev);
+        next = (ImageButton) rootView.findViewById(R.id.Button_quizNext);
 
         // Get question
         q = Control.questions.get(currQuestion);
@@ -209,6 +210,27 @@ public class QuizQuestionFragment extends Fragment {
         four = (Button) rootView.findViewById(R.id.Button_quizFour);
         five = (Button) rootView.findViewById(R.id.Button_quizFive);
 
+        if(Control.quizMode == 1) {
+            one.setVisibility(View.INVISIBLE);
+            two.setVisibility(View.INVISIBLE);
+            three.setVisibility(View.INVISIBLE);
+            four.setVisibility(View.INVISIBLE);
+            five.setVisibility(View.INVISIBLE);
+            next.setVisibility(View.VISIBLE);
+            next.setEnabled(false);
+
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
+                    mListener.onNextPressed(currQuestion, lastQuestion, -1);
+                }
+            });
+        } else {
+            next.setVisibility(View.INVISIBLE);
+            next.setEnabled(false);
+        }
+
         answerChoices = (ListView) rootView.findViewById(R.id.listView_quizQuestion);
         answerChoices.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
@@ -227,19 +249,23 @@ public class QuizQuestionFragment extends Fragment {
                         feedback.setText("Correct! How well did you know it?");
                         feedbackImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_correct));
                         feedbackImage.setVisibility(View.VISIBLE);
-                        feedback.setVisibility(View.VISIBLE);
                         ratingRow.setVisibility(View.VISIBLE);
+
+                        if(Control.quizMode != 1)
+                            feedback.setVisibility(View.VISIBLE);
 
                         if (!q.answered) {
                             q.answered = true;
 
 //                            // make navigation visible
-//                            next.setEnabled(true);
-//                            if (currQuestion < Control.questions.size() - 1) {
-//                                next.setBackgroundResource(R.drawable.button_selector_next);
-//                            } else {
-//                                next.setBackgroundResource(R.drawable.button_selector_report);
-//                            }
+                            if(Control.quizMode == 1) {
+                                next.setEnabled(true);
+                                if (currQuestion < Control.questions.size() - 1) {
+                                    next.setBackgroundResource(R.drawable.button_selector_next);
+                                } else {
+                                    next.setBackgroundResource(R.drawable.button_selector_report);
+                                }
+                            }
                         }
                     } else {
                         feedback.setText("Incorrect!");
@@ -296,6 +322,7 @@ public class QuizQuestionFragment extends Fragment {
                     feedback.setText("How well did you know it?");
                     feedback.setVisibility(View.VISIBLE);
                     ratingRow.setVisibility(View.VISIBLE);
+                    next.setEnabled(true);
 //                    // Make thumbs up and down visible
 //                    thumbsUp.setVisibility(View.VISIBLE);
 //                    thumbsDown.setVisibility(View.VISIBLE);
@@ -328,37 +355,6 @@ public class QuizQuestionFragment extends Fragment {
 //                }
 //            });
 
-//            thumbsUp.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    thumbsUp.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_up_pressed));
-//                    thumbsDown.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_down));
-//                    q.answeredCorrectly = true;
-//
-//                    next.setEnabled(true);
-//                    if (currQuestion < Control.questions.size() - 1) {
-//                        next.setBackgroundResource(R.drawable.button_selector_next);
-//                    } else {
-//                        next.setBackgroundResource(R.drawable.button_selector_report);
-//                    }
-//                }
-//            });
-//
-//            thumbsDown.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    thumbsDown.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_down_pressed));
-//                    thumbsUp.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_up));
-//                    q.answeredCorrectly = false;
-//
-//                    next.setEnabled(true);
-//                    if (currQuestion < Control.questions.size() - 1) {
-//                        next.setBackgroundResource(R.drawable.button_selector_next);
-//                    } else {
-//                        next.setBackgroundResource(R.drawable.button_selector_report);
-//                    }
-//                }
-//            });
         }
 
 
@@ -375,9 +371,6 @@ public class QuizQuestionFragment extends Fragment {
             } else if (q instanceof FlashCard) {
                 answerChoices.setItemChecked(0, true);
 
-//                thumbsUp.setVisibility(View.VISIBLE);
-//                thumbsDown.setVisibility(View.VISIBLE);
-//                correct.setVisibility(View.VISIBLE);
                 feedback.setText("How well did you know it?");
                 feedback.setVisibility(View.VISIBLE);
                 ratingRow.setVisibility(View.VISIBLE);

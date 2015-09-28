@@ -10,12 +10,13 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
         android:layout_weight="0.425"
         android:background="#ca4c4d"
         >
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -35,12 +36,12 @@
         </ScrollView>
 
         <ImageView
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
             android:id="@+id/ImageView_editQuestion"
-            android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:src="@drawable/ic_create_black_48dp"/>
     </RelativeLayout>
 
@@ -240,21 +241,21 @@
                 />
         </LinearLayout>
 
-        <!--<LinearLayout-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--android:gravity="center">-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
 
-        <!--<ImageButton-->
-        <!--android:gravity="center_horizontal|center_vertical"-->
-        <!--android:id="@+id/Button_quizNext"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@drawable/button_selector_next"-->
-        <!--/>-->
+            <ImageButton
+                android:id="@+id/Button_quizNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_selector_next"
+                android:gravity="center_horizontal|center_vertical"
+                />
 
-        <!--</LinearLayout>-->
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

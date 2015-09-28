@@ -106,6 +106,7 @@ public class QuizConfigureFragment extends Fragment {
                 } else if (Control.minScore < 0) {
                     Toast.makeText(getActivity(), "Please enter a valid minimum score", Toast.LENGTH_SHORT).show();
                 } else {
+                    Control.quizMode = option;
                     mListener.onQuizConfigured(option);
                 }
 
