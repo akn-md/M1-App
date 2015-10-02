@@ -218,14 +218,6 @@ public class QuizQuestionFragment extends Fragment {
             five.setVisibility(View.INVISIBLE);
             next.setVisibility(View.VISIBLE);
             next.setEnabled(false);
-
-            next.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
-                    mListener.onNextPressed(currQuestion, lastQuestion, -1);
-                }
-            });
         } else {
             next.setVisibility(View.INVISIBLE);
             next.setEnabled(false);
@@ -246,17 +238,18 @@ public class QuizQuestionFragment extends Fragment {
                                         long id) {
                     // correct answer
                     if (q.answer.equals(((MultipleChoice) q).choices.get(position))) {
-                        feedback.setText("Correct! How well did you know it?");
+                        if(Control.quizMode == 1) {
+                            feedback.setVisibility(View.INVISIBLE);
+                        } else {
+                            feedback.setText("Correct! How well did you know it?");
+                            feedback.setVisibility(View.VISIBLE);
+                        }
+
                         feedbackImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_correct));
                         feedbackImage.setVisibility(View.VISIBLE);
                         ratingRow.setVisibility(View.VISIBLE);
 
-                        if(Control.quizMode != 1)
-                            feedback.setVisibility(View.VISIBLE);
-
                         if (!q.answered) {
-                            q.answered = true;
-
 //                            // make navigation visible
                             if(Control.quizMode == 1) {
                                 next.setEnabled(true);
@@ -317,10 +310,11 @@ public class QuizQuestionFragment extends Fragment {
                         answer.setText(q.answer);
                     }
 
-                    q.answered = true;
-
                     feedback.setText("How well did you know it?");
-                    feedback.setVisibility(View.VISIBLE);
+
+                    if(Control.quizMode != 1)
+                        feedback.setVisibility(View.VISIBLE);
+
                     ratingRow.setVisibility(View.VISIBLE);
                     next.setEnabled(true);
 //                    // Make thumbs up and down visible
@@ -359,47 +353,44 @@ public class QuizQuestionFragment extends Fragment {
 
 
         if (q.answered) {
+            one.setEnabled(false);
+            two.setEnabled(false);
+            three.setEnabled(false);
+            four.setEnabled(false);
+            five.setEnabled(false);
+            next.setEnabled(true);
+            next.setVisibility(View.VISIBLE);
+
+
             if (q instanceof MultipleChoice) {
                 int index = ((MultipleChoice) q).choices.indexOf(q.answer);
                 answerChoices.setItemChecked(index, true);
 
-                feedback.setText("Correct! How well did you know it?");
+                if(Control.quizMode == 1) {
+                    feedback.setVisibility(View.INVISIBLE);
+                } else {
+                    feedback.setText("Correct! How well did you know it?");
+                    feedback.setVisibility(View.VISIBLE);
+                }
+
                 feedbackImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_correct));
                 feedbackImage.setVisibility(View.VISIBLE);
-                feedback.setVisibility(View.VISIBLE);
+
                 ratingRow.setVisibility(View.VISIBLE);
             } else if (q instanceof FlashCard) {
                 answerChoices.setItemChecked(0, true);
 
-                feedback.setText("How well did you know it?");
-                feedback.setVisibility(View.VISIBLE);
-                ratingRow.setVisibility(View.VISIBLE);
-
-                if (q.answeredCorrectly) {
-//                    thumbsUp.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_up_pressed));
+                if(Control.quizMode == 1) {
+                    feedback.setVisibility(View.INVISIBLE);
                 } else {
-//                    thumbsDown.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_thumbs_down_pressed));
+                    feedback.setText("How well did you know it?");
+                    feedback.setVisibility(View.VISIBLE);
                 }
-            }
 
+                ratingRow.setVisibility(View.VISIBLE);
+            }
         }
 
-        // Set up next and prev arrows
-//        if (!q.answered) {
-//            next.setEnabled(false);
-//
-//            if (currQuestion < Control.questions.size() - 1)
-//                next.setBackgroundResource(R.drawable.ic_action_next_disabled);
-//            else
-//                next.setBackgroundResource(R.drawable.ic_action_report_disabled);
-//
-//        } else if (currQuestion == Control.questions.size() - 1) {
-//            next.setEnabled(true);
-//            next.setBackgroundResource(R.drawable.button_selector_report);
-//        } else {
-//            next.setEnabled(true);
-//            next.setBackgroundResource(R.drawable.button_selector_next);
-//        }
         if (currQuestion == 0) {
             prev.setEnabled(false);
             prev.setBackgroundResource(R.drawable.ic_action_prev_disabled);
@@ -408,13 +399,14 @@ public class QuizQuestionFragment extends Fragment {
             prev.setBackgroundResource(R.drawable.button_selector_prev);
         }
 
-//        next.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
-//                mListener.onNextPressed(currQuestion, lastQuestion, 5);
-//            }
-//        });
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                q.answered = true;
+                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
+                mListener.onNextPressed(currQuestion, lastQuestion, -1);
+            }
+        });
 
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -484,6 +476,7 @@ public class QuizQuestionFragment extends Fragment {
             q.score = score;
         }
 
+        q.answered = true;
         Toast.makeText(getActivity(), "Updated score = " + q.score, Toast.LENGTH_SHORT).show();
     }
 

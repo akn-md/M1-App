@@ -11,7 +11,7 @@ public class ProcessData {
     }
 
     public static void processQuestions() {
-        String root = "/Users/Ashwin/Drive/Developer/Projects/M1/imports/Imports/PATH_9_17_15";
+        String root = "/Users/Ashwin/Drive/Developer/Projects/M1/imports/Imports/9_30_15/CPP_exam1";
 
         String pathToData = root + ".txt";
         String pathToDataJson = root + ".json";
@@ -64,13 +64,13 @@ public class ProcessData {
                 data[i] = data[i].replaceAll("\"", "");
             }
 
-            TextIO.putln("\"Class\": \"" + data[0] + "\",");
-            TextIO.putln("\"Author\": \"" + data[1] + "\",");
-            TextIO.putln("\"Q\": \"" + data[2] + "\",");
-            TextIO.putln("\"A\": \"" + data[3] + "\",");
-            TextIO.putln("\"Type\": \"" + data[4] + "\",");
-            TextIO.putln("\"Subclass\": \"" + data[5] + "\",");
-            TextIO.putln("\"Topic\": \"" + data[6] + "\",");
+            TextIO.putln("\"Class\": \"" + data[0].trim() + "\",");
+            TextIO.putln("\"Author\": \"" + data[1].trim() + "\",");
+            TextIO.putln("\"Q\": \"" + data[2].trim() + "\",");
+            TextIO.putln("\"A\": \"" + data[3].trim() + "\",");
+            TextIO.putln("\"Type\": \"" + data[4].trim() + "\",");
+            TextIO.putln("\"Subclass\": \"" + data[5].trim() + "\",");
+            TextIO.putln("\"Topic\": \"" + data[6].trim() + "\",");
             TextIO.putln("\"Score_Kristen\": " + 0 + ",");
             TextIO.putln("\"Score_Ashwin\": " + 0);
 
@@ -87,7 +87,7 @@ public class ProcessData {
             }
 
             for(int i = 0; i < subClasses.size(); i++) {
-                if(subClasses.get(i).className.equals(data[4])) {
+                if(subClasses.get(i).className.equals(data[5])) {
                     subClassExists = true;
                     subClassIndex = i;
                 }
@@ -97,30 +97,30 @@ public class ProcessData {
             if(classExists) {
                 // check subclasses and if it isn't linked to class we link it
                 // we don't add it to subClasses because it might already exist (by being linked to another class)
-                if (!classes.get(classIndex).subclasses.contains(data[4])) {
-                    classes.get(classIndex).subclasses.add(data[4]);
+                if (!classes.get(classIndex).subclasses.contains(data[5])) {
+                    classes.get(classIndex).subclasses.add(data[5]);
                 }
 
                 // check if subClass exists in subClasses
                 if(subClassExists) {
                     // check topics and if it isn't linked to subclass we link it
-                    if (!subClasses.get(subClassIndex).subclasses.contains(data[5])) {
-                        subClasses.get(subClassIndex).subclasses.add(data[5]);
-                        newTopics.add(data[5]);
+                    if (!subClasses.get(subClassIndex).subclasses.contains(data[6])) {
+                        subClasses.get(subClassIndex).subclasses.add(data[6]);
+                        newTopics.add(data[6]);
                     }
                 } else {
                     // subClass doesn't exist in subClasses so we create it and link topic
                     ArrayList<String> newTops = new ArrayList<String>();
-                    newTops.add(data[5]);
-                    Subject newSub = new Subject(data[4], newTops);
+                    newTops.add(data[6]);
+                    Subject newSub = new Subject(data[5], newTops);
                     subClasses.add(newSub);
-                    newSubclasses.add(data[4]);
-                    newTopics.add(data[5]);
+                    newSubclasses.add(data[5]);
+                    newTopics.add(data[6]);
                 }
             } else {
                 // Add new class to classes and link subClass
                 ArrayList<String> newSubs = new ArrayList<String>();
-                newSubs.add(data[4]);
+                newSubs.add(data[5]);
                 Subject s = new Subject(data[0], newSubs);
                 classes.add(s);
                 newClasses.add(data[0]);
@@ -128,18 +128,18 @@ public class ProcessData {
                 // check if subClass exists in subClasses
                 if(subClassExists) {
                     // check topics and link if it doesn't exist
-                    if (!subClasses.get(subClassIndex).subclasses.contains(data[5])) {
-                        subClasses.get(subClassIndex).subclasses.add(data[5]);
-                        newTopics.add(data[5]);
+                    if (!subClasses.get(subClassIndex).subclasses.contains(data[6])) {
+                        subClasses.get(subClassIndex).subclasses.add(data[6]);
+                        newTopics.add(data[6]);
                     }
                 } else {
                     // subClass doesn't exist
                     ArrayList<String> newTops = new ArrayList<String>();
-                    newTops.add(data[5]);
-                    Subject newSub = new Subject(data[4], newTops);
+                    newTops.add(data[6]);
+                    Subject newSub = new Subject(data[5], newTops);
                     subClasses.add(newSub);
-                    newSubclasses.add(data[4]);
-                    newTopics.add(data[5]);
+                    newSubclasses.add(data[5]);
+                    newTopics.add(data[6]);
                 }
             }
 
@@ -213,7 +213,7 @@ public class ProcessData {
 
             TextIO.putln("{");
             TextIO.putln("\"Subclass\": \"" + subClasses.get(i).className + "\",");
-            TextIO.putln("\"isCurrentMaterial\": \"" + true + "\",");
+            TextIO.putln("\"isCurrentMaterial\": " + true + ",");
 
             TextIO.put("\"Topics\": [");
             for (int j = 0; j < subClasses.get(i).subclasses.size(); j++) {

@@ -85,6 +85,7 @@ public class Query {
 
 //        query.orderByAscending("Score");
 //        query.setLimit(count);
+        query.setLimit(1000);
 
         List<ParseObject> ret = null;
         try {
