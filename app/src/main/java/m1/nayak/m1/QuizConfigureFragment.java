@@ -113,6 +113,7 @@ public class QuizConfigureFragment extends Fragment {
                     Log.d("ASH","highyield=" + Control.highYield);
                     Log.d("ASH", "rankingsOn=" + Control.rankingsOn);
 
+                    Control.lastUnansweredQuestionIndex = 0;
                     mListener.onQuizConfigured();
                 }
 

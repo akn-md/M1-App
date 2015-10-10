@@ -109,8 +109,8 @@ public class QuizQuestionFragment extends Fragment {
         currQuestionIndex = Control.questionIndices.get(indicesIndex);
         q = Control.questions.get(currQuestionIndex);
 
-        Log.d("ASH","indicesIndex = " + indicesIndex);
-        Log.d("ASH","currQuestionIndex = " + currQuestionIndex);
+        Log.d("ASH", "indicesIndex = " + indicesIndex);
+        Log.d("ASH", "currQuestionIndex = " + currQuestionIndex);
 
 
         // Question
@@ -502,7 +502,7 @@ public class QuizQuestionFragment extends Fragment {
 
     public void updateScore(double update) {
 
-        if(Control.rankingsOn) {
+        if (Control.rankingsOn) {
             double score = q.score;
 
             if (update < score) {
@@ -518,16 +518,16 @@ public class QuizQuestionFragment extends Fragment {
             Toast.makeText(getActivity(), "Updated score = " + q.score, Toast.LENGTH_SHORT).show();
         }
 
-        if(Control.spacedRepetitionOn) {
+        if (Control.spacedRepetitionOn) {
             int calculatedIndex = 0;
 
-            if(Control.rankingsOn) {
-                if(q.score < 4.0) {
-                    if(q.score < 1.0) {
+            if (Control.rankingsOn) {
+                if (q.score < 4.0) {
+                    if (q.score < 1.0) {
                         calculatedIndex = indicesIndex + 3;
-                    } else if(q.score < 2.0) {
+                    } else if (q.score < 2.0) {
                         calculatedIndex = indicesIndex + 4;
-                    } else if(q.score < 3.0) {
+                    } else if (q.score < 3.0) {
                         calculatedIndex = indicesIndex + 5;
                     } else {
                         calculatedIndex = Control.questionIndices.size();
@@ -535,7 +535,7 @@ public class QuizQuestionFragment extends Fragment {
 
                     Log.d("ASH", "Calculated Index = " + calculatedIndex);
 
-                    if(calculatedIndex > Control.questionIndices.size() - 1) {
+                    if (calculatedIndex > Control.questionIndices.size() - 1) {
                         Control.questionIndices.add(currQuestionIndex);
                         Log.d("ASH", "Added currQuestionIndex " + currQuestionIndex + " to end");
                     } else {
@@ -547,6 +547,24 @@ public class QuizQuestionFragment extends Fragment {
                 // 1 = soon
                 // 2 = later
                 // 3 = never
+                if (update != 5.0) {
+
+                    if (update == 1.0) {
+                        calculatedIndex = indicesIndex + 3;
+                    } else if (update == 3.0) {
+                        calculatedIndex = Control.questionIndices.size();
+                    }
+
+                    Log.d("ASH", "Calculated Index = " + calculatedIndex);
+
+                    if (calculatedIndex > Control.questionIndices.size() - 1) {
+                        Control.questionIndices.add(currQuestionIndex);
+                        Log.d("ASH", "Added currQuestionIndex " + currQuestionIndex + " to end");
+                    } else {
+                        Control.questionIndices.add(calculatedIndex, currQuestionIndex);
+                        Log.d("ASH", "Added currQuestionIndex " + currQuestionIndex + " to indicesIndex " + calculatedIndex);
+                    }
+                }
             }
 
         }
