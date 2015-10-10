@@ -62,6 +62,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <ToggleButton
+            android:id="@+id/Switch_random"
+            android:textOff="In Order"
+            android:textOn="Random"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ToggleButton
+            android:id="@+id/Switch_spacedRepetition"
+            android:textOff="No Repetition"
+            android:textOn="Spaced Repetition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ToggleButton
+            android:id="@+id/Switch_highYieldOnly"
+            android:textOff="All Questions"
+            android:textOn="High-Yield Questions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
         <View
             android:layout_marginTop="10dp"
             android:layout_width="fill_parent"

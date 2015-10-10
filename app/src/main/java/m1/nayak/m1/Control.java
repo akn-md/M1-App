@@ -15,23 +15,37 @@ public class Control {
 
     public static boolean subClassesLoaded = false;
 
-    public static ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
 
+    // data
     public static ArrayList<Subject> classes = new ArrayList<Subject>();
     public static ArrayList<Subject> subclasses = new ArrayList<Subject>();
+
+    // quiz data
     public static ArrayList<Question> questions = new ArrayList<Question>();
+    public static ArrayList<Integer> questionIndices;
+
 
     public static boolean[] selectedItems;
 
+    // scores
     public static HashMap<String, Double> classScores = new HashMap<String, Double>();
     public static HashMap<String, Double> subClassScores = new HashMap<String, Double>();
     public static HashMap<String, Double> topicScores = new HashMap<String, Double>();
 
     // for question updates
     public static double updateIncrement = 0.75;
-    public static double minScore;
     public static Question update;
-    public static int quizMode;
+
+    // quiz params
+    public static int lastUnansweredQuestionIndex = 0;
+    public static boolean rankingsOn;
+    public static boolean isRandomQuiz;
+    public static boolean spacedRepetitionOn;
+    public static boolean highYield;
+    public static boolean isFocusedReview;
+    public static double minScore;
+
+
 
 
 

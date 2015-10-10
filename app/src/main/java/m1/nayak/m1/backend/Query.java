@@ -68,7 +68,7 @@ public class Query {
 //        Collections.shuffle(Control.questions);
     }
 
-    public static void getGKQuestions(ArrayList<String> subClasses, ArrayList<String> topics, int mode) throws ParseException {
+    public static void getGKQuestions(ArrayList<String> subClasses, ArrayList<String> topics) throws ParseException {
         Control.questions.clear();
         HashMap<String, ArrayList<String>> allAnswerChoices = new HashMap<String, ArrayList<String>>();
 
@@ -79,7 +79,7 @@ public class Query {
         query.whereContainedIn("Topic", topics);
         query.orderByAscending("createdAt");
 
-        if (mode == 3) {
+        if (Control.isFocusedReview) {
             query.whereLessThan("Score_" + Control.user, Control.minScore);
         }
 
@@ -99,16 +99,21 @@ public class Query {
             for (int i = 0; i < ret.size(); i++) {
                 createQuestion(ret, i, allAnswerChoices);
             }
-
-            if (mode != 1) {
-                Collections.shuffle(Control.questions);
-            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        if (Control.isRandomQuiz) {
+            Collections.shuffle(Control.questions);
+        }
+
+        Control.questionIndices = new ArrayList<Integer>(Control.questions.size());
+        for(int i = 0; i < Control.questions.size(); i++) {
+            Control.questionIndices.add(i);
+        }
     }
 
-    // TODO: if question or answer is null, try different random combo
+    // TODO: if question or answer is null, try different isRandomQuiz combo
     public static void getEnzymeQuestions(boolean smart, int count) {
         String entity = "EnzymeTest";
         ParseQuery<ParseObject> query = ParseQuery.getQuery(entity);

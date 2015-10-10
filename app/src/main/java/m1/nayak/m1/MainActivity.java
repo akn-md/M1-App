@@ -52,7 +52,6 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
     ArrayList<String> chosenClasses;
     ArrayList<String> chosenSubclasses;
     ArrayList<String> chosenTopics;
-    int mode;
 
     // quiz navigation
     int curr;
@@ -154,7 +153,7 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
                 break;
             // Quiz question
             case 2:
-                fragment = QuizQuestionFragment.newInstance(false, curr, Control.questions.size());
+                fragment = QuizQuestionFragment.newInstance(false, curr);
                 break;
             // Quiz results
             case 3:
@@ -229,25 +228,18 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
 
 
     @Override
-    public void onQuizConfigured(int option) {
-//        chosenCategories = categories;
-//        smartQuiz = smart;
-//
-//        // TODO: Only show view 4 (class filters) if General Knowledge category is checked, otherwise start quiz
-
-
-//        displayView(4, true);
-
-        mode = option;
-        dialog = new ProgressDialog(this);
-        new GetQuestions().execute();
+    public void onQuizConfigured() {
+        displayView(4, true);
     }
 
     @Override
-    public void onNextPressed(int c, boolean lastQuestion, int rating) {
+    public void onNextPressed(int c, boolean lastQuestion) {
 
-        Log.d("ASH", "Rating = " + rating);
+
         if (!lastQuestion) {
+
+            if(Control.lastUnansweredQuestionIndex == curr)
+                Control.lastUnansweredQuestionIndex++;
             curr++;
             displayView(2, true);
         } else {
@@ -303,12 +295,8 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
 //            Log.d("ASH", s);
 //        }
 //
-//        Log.d("ASH", "Smart quiz = " + smartQuiz);
-
-        displayView(1, true);
-
-//        dialog = new ProgressDialog(this);
-//        new GetQuestions().execute();
+        dialog = new ProgressDialog(this);
+        new GetQuestions().execute();
     }
 
     @Override
@@ -340,7 +328,6 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
 
     @Override
     public void onDailyQuestionsStarted(int numQuestions, int percentageCurrent) {
-        Control.quizMode = 4;
         String[] data = {""+numQuestions, ""+percentageCurrent};
         new DailyQuestions().execute(data);
     }
@@ -361,7 +348,7 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
 
     // Button listeners
     public void quizMe(View view) {
-        displayView(4, true);
+        displayView(1, true);
     }
 
     public void dailyQuestions(View view) {
@@ -416,8 +403,7 @@ public class MainActivity extends ActionBarActivity implements DailyFragment.OnF
 
         protected String doInBackground(String... args) {
             try {
-//                Query.getData(chosenSubclasses, chosenTopics, chosenCategories, mode);
-                Query.getGKQuestions(chosenSubclasses, chosenTopics, mode);
+                Query.getGKQuestions(chosenSubclasses, chosenTopics);
             } catch (ParseException e) {
                 e.printStackTrace();
             }

@@ -11,7 +11,7 @@ public class ProcessData {
     }
 
     public static void processQuestions() {
-        String root = "/Users/Ashwin/Drive/Developer/Projects/M1/imports/Imports/9_30_15/CPP_exam1";
+        String root = "/Users/Ashwin/Drive/Developer/Projects/M1/imports/Imports/10_7_15/IM_clostridia";
 
         String pathToData = root + ".txt";
         String pathToDataJson = root + ".json";

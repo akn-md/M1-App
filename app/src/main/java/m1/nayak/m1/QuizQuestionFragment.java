@@ -32,8 +32,8 @@ import m1.nayak.m1.objects.Question;
 public class QuizQuestionFragment extends Fragment {
     // Parameters
     private boolean multiAnswer;
-    private int numQuestions;
-    private int currQuestion;
+    private int indicesIndex;
+    private int currQuestionIndex;
 
     private OnFragmentInteractionListener mListener;
 
@@ -67,12 +67,11 @@ public class QuizQuestionFragment extends Fragment {
     // navigation
     ImageButton prev, next;
 
-    public static QuizQuestionFragment newInstance(boolean multi, int curr, int total) {
+    public static QuizQuestionFragment newInstance(boolean multi, int curr) {
         QuizQuestionFragment fragment = new QuizQuestionFragment();
         Bundle args = new Bundle();
         args.putBoolean("MULTI", multi);
         args.putInt("CURR", curr);
-        args.putInt("TOTAL", total);
         fragment.setArguments(args);
         return fragment;
     }
@@ -86,8 +85,7 @@ public class QuizQuestionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             multiAnswer = getArguments().getBoolean("MULTI");
-            numQuestions = getArguments().getInt("TOTAL");
-            currQuestion = getArguments().getInt("CURR");
+            indicesIndex = getArguments().getInt("CURR");
 
         }
     }
@@ -100,15 +98,20 @@ public class QuizQuestionFragment extends Fragment {
 
         // progress
         quizProgress = (ProgressBar) rootView.findViewById(R.id.progressBar_quizQuestion);
-        quizProgress.setMax(numQuestions);
-        quizProgress.setProgress(currQuestion + 1);
+        quizProgress.setMax(Control.questionIndices.size());
+        quizProgress.setProgress(indicesIndex + 1);
 
         // navigation
         prev = (ImageButton) rootView.findViewById(R.id.Button_quizPrev);
         next = (ImageButton) rootView.findViewById(R.id.Button_quizNext);
 
         // Get question
-        q = Control.questions.get(currQuestion);
+        currQuestionIndex = Control.questionIndices.get(indicesIndex);
+        q = Control.questions.get(currQuestionIndex);
+
+        Log.d("ASH","indicesIndex = " + indicesIndex);
+        Log.d("ASH","currQuestionIndex = " + currQuestionIndex);
+
 
         // Question
         question = (TextView) rootView.findViewById(R.id.TextView_question);
@@ -210,18 +213,46 @@ public class QuizQuestionFragment extends Fragment {
         four = (Button) rootView.findViewById(R.id.Button_quizFour);
         five = (Button) rootView.findViewById(R.id.Button_quizFive);
 
-        if(Control.quizMode == 1) {
-            one.setVisibility(View.INVISIBLE);
-            two.setVisibility(View.INVISIBLE);
-            three.setVisibility(View.INVISIBLE);
-            four.setVisibility(View.INVISIBLE);
-            five.setVisibility(View.INVISIBLE);
-            next.setVisibility(View.VISIBLE);
-            next.setEnabled(false);
-        } else {
+        if (Control.rankingsOn) {
+            one.setVisibility(View.VISIBLE);
+            two.setVisibility(View.VISIBLE);
+            three.setVisibility(View.VISIBLE);
+            four.setVisibility(View.VISIBLE);
+            five.setVisibility(View.VISIBLE);
+
             next.setVisibility(View.INVISIBLE);
-            next.setEnabled(false);
+        } else {
+            if (Control.spacedRepetitionOn) {
+                // No rankings but spaced repetition is ON
+                one.setVisibility(View.VISIBLE);
+                two.setVisibility(View.INVISIBLE);
+                three.setVisibility(View.VISIBLE);
+                four.setVisibility(View.INVISIBLE);
+                five.setVisibility(View.VISIBLE);
+
+                one.setText("Soon");
+                three.setText("Later");
+                five.setText("Never");
+
+                next.setVisibility(View.INVISIBLE);
+            } else {
+                // No rankings or spaced repetition
+                one.setVisibility(View.INVISIBLE);
+                two.setVisibility(View.INVISIBLE);
+                three.setVisibility(View.INVISIBLE);
+                four.setVisibility(View.INVISIBLE);
+                five.setVisibility(View.INVISIBLE);
+
+                next.setVisibility(View.VISIBLE);
+                if (indicesIndex < Control.questionIndices.size() - 1) {
+                    next.setBackgroundResource(R.drawable.button_selector_next);
+                } else {
+                    next.setBackgroundResource(R.drawable.button_selector_report);
+                }
+            }
         }
+
+        next.setEnabled(false);
 
         answerChoices = (ListView) rootView.findViewById(R.id.listView_quizQuestion);
         answerChoices.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -238,28 +269,24 @@ public class QuizQuestionFragment extends Fragment {
                                         long id) {
                     // correct answer
                     if (q.answer.equals(((MultipleChoice) q).choices.get(position))) {
-                        if(Control.quizMode == 1) {
-                            feedback.setVisibility(View.INVISIBLE);
-                        } else {
+                        if (Control.rankingsOn) {
                             feedback.setText("Correct! How well did you know it?");
-                            feedback.setVisibility(View.VISIBLE);
-                        }
-
-                        feedbackImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_correct));
-                        feedbackImage.setVisibility(View.VISIBLE);
-                        ratingRow.setVisibility(View.VISIBLE);
-
-                        if (!q.answered) {
-//                            // make navigation visible
-                            if(Control.quizMode == 1) {
-                                next.setEnabled(true);
-                                if (currQuestion < Control.questions.size() - 1) {
-                                    next.setBackgroundResource(R.drawable.button_selector_next);
-                                } else {
-                                    next.setBackgroundResource(R.drawable.button_selector_report);
-                                }
+                        } else {
+                            if (Control.spacedRepetitionOn) {
+                                feedback.setText("Correct! When do you want to see this question again?");
+                            } else {
+                                feedback.setText("Correct!");
                             }
                         }
+                        feedbackImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_correct));
+
+                        feedback.setVisibility(View.VISIBLE);
+                        feedbackImage.setVisibility(View.VISIBLE);
+
+                        // view navigation
+                        ratingRow.setVisibility(View.VISIBLE);
+                        next.setEnabled(true);
+
                     } else {
                         feedback.setText("Incorrect!");
                         feedbackImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_incorrect));
@@ -284,19 +311,9 @@ public class QuizQuestionFragment extends Fragment {
             answer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // add bullet points
-                    if (q.answer.contains(";")) {
-                        String answer = "";
-                        String[] parts = q.answer.split(";");
-                        for (String s : parts) {
-                            answer += "• " + s + "\n";
-                        }
-                        q.answer = answer;
-                    }
+                    String a = "";
                     // add boldness
                     if (q.answer.contains("*")) {
-                        String a = "";
-
                         String[] parts = q.answer.split("\\*");
 
                         for (int i = 0; i < parts.length; i++) {
@@ -304,23 +321,36 @@ public class QuizQuestionFragment extends Fragment {
                             i++;
                             if (i < parts.length) a += "<b>" + parts[i] + "</b>";
                         }
-
-                        answer.setText(Html.fromHtml(a));
                     } else {
-                        answer.setText(q.answer);
+                        a = q.answer;
                     }
 
-                    feedback.setText("How well did you know it?");
+                    // add bullet points
+                    if (a.contains(";")) {
+                        String answer = "";
+                        String[] parts = a.split(";");
+                        for (String s : parts) {
+                            answer += "• " + s.trim() + "\n";
+                        }
+                        a = answer;
+                    }
 
-                    if(Control.quizMode != 1)
-                        feedback.setVisibility(View.VISIBLE);
+                    // set final answer
+                    answer.setText(Html.fromHtml(a));
 
+                    if (Control.rankingsOn) {
+                        feedback.setText("How well did you know it?");
+                    } else {
+                        if (Control.spacedRepetitionOn) {
+                            feedback.setText("When do you want to see this question again?");
+                        } else {
+                            feedback.setText("");
+                        }
+                    }
+
+                    feedback.setVisibility(View.VISIBLE);
                     ratingRow.setVisibility(View.VISIBLE);
                     next.setEnabled(true);
-//                    // Make thumbs up and down visible
-//                    thumbsUp.setVisibility(View.VISIBLE);
-//                    thumbsDown.setVisibility(View.VISIBLE);
-//                    correct.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -352,7 +382,7 @@ public class QuizQuestionFragment extends Fragment {
         }
 
 
-        if (q.answered) {
+        if (indicesIndex < Control.lastUnansweredQuestionIndex) {
             one.setEnabled(false);
             two.setEnabled(false);
             three.setEnabled(false);
@@ -366,32 +396,39 @@ public class QuizQuestionFragment extends Fragment {
                 int index = ((MultipleChoice) q).choices.indexOf(q.answer);
                 answerChoices.setItemChecked(index, true);
 
-                if(Control.quizMode == 1) {
-                    feedback.setVisibility(View.INVISIBLE);
-                } else {
+                if (Control.rankingsOn) {
                     feedback.setText("Correct! How well did you know it?");
-                    feedback.setVisibility(View.VISIBLE);
+                } else {
+                    if (Control.spacedRepetitionOn) {
+                        feedback.setText("Correct! When do you want to see this question again?");
+                    } else {
+                        feedback.setText("Correct!");
+                    }
                 }
-
                 feedbackImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_correct));
-                feedbackImage.setVisibility(View.VISIBLE);
 
+                feedback.setVisibility(View.VISIBLE);
+                feedbackImage.setVisibility(View.VISIBLE);
                 ratingRow.setVisibility(View.VISIBLE);
             } else if (q instanceof FlashCard) {
                 answerChoices.setItemChecked(0, true);
 
-                if(Control.quizMode == 1) {
-                    feedback.setVisibility(View.INVISIBLE);
-                } else {
+                if (Control.rankingsOn) {
                     feedback.setText("How well did you know it?");
-                    feedback.setVisibility(View.VISIBLE);
+                } else {
+                    if (Control.spacedRepetitionOn) {
+                        feedback.setText("When do you want to see this question again?");
+                    } else {
+                        feedback.setText("");
+                    }
                 }
 
+                feedback.setVisibility(View.VISIBLE);
                 ratingRow.setVisibility(View.VISIBLE);
             }
         }
 
-        if (currQuestion == 0) {
+        if (indicesIndex == 0) {
             prev.setEnabled(false);
             prev.setBackgroundResource(R.drawable.ic_action_prev_disabled);
         } else {
@@ -403,15 +440,15 @@ public class QuizQuestionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 q.answered = true;
-                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
-                mListener.onNextPressed(currQuestion, lastQuestion, -1);
+                boolean lastQuestion = (indicesIndex == Control.questionIndices.size() - 1) ? true : false;
+                mListener.onNextPressed(indicesIndex, lastQuestion);
             }
         });
 
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onPrevPressed(currQuestion);
+                mListener.onPrevPressed(indicesIndex);
             }
         });
 
@@ -419,8 +456,8 @@ public class QuizQuestionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateScore(1);
-                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
-                mListener.onNextPressed(currQuestion, lastQuestion, 1);
+                boolean lastQuestion = (indicesIndex == Control.questionIndices.size() - 1) ? true : false;
+                mListener.onNextPressed(indicesIndex, lastQuestion);
             }
         });
 
@@ -428,8 +465,8 @@ public class QuizQuestionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateScore(2);
-                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
-                mListener.onNextPressed(currQuestion, lastQuestion, 2);
+                boolean lastQuestion = (indicesIndex == Control.questionIndices.size() - 1) ? true : false;
+                mListener.onNextPressed(indicesIndex, lastQuestion);
             }
         });
 
@@ -437,8 +474,8 @@ public class QuizQuestionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateScore(3);
-                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
-                mListener.onNextPressed(currQuestion, lastQuestion, 3);
+                boolean lastQuestion = (indicesIndex == Control.questionIndices.size() - 1) ? true : false;
+                mListener.onNextPressed(indicesIndex, lastQuestion);
             }
         });
 
@@ -446,8 +483,8 @@ public class QuizQuestionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateScore(4);
-                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
-                mListener.onNextPressed(currQuestion, lastQuestion, 4);
+                boolean lastQuestion = (indicesIndex == Control.questionIndices.size() - 1) ? true : false;
+                mListener.onNextPressed(indicesIndex, lastQuestion);
             }
         });
 
@@ -455,8 +492,8 @@ public class QuizQuestionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateScore(5);
-                boolean lastQuestion = (currQuestion == Control.questions.size() - 1) ? true : false;
-                mListener.onNextPressed(currQuestion, lastQuestion, 5);
+                boolean lastQuestion = (indicesIndex == Control.questionIndices.size() - 1) ? true : false;
+                mListener.onNextPressed(indicesIndex, lastQuestion);
             }
         });
 
@@ -465,19 +502,54 @@ public class QuizQuestionFragment extends Fragment {
 
     public void updateScore(double update) {
 
-        double score = q.score;
+        if(Control.rankingsOn) {
+            double score = q.score;
 
-        if (update < score) {
-            q.score = update;
-        } else {
-            double diff = update - score;
-            double increment = diff * Control.updateIncrement;
-            score += increment;
-            q.score = score;
+            if (update < score) {
+                q.score = update;
+            } else {
+                double diff = update - score;
+                double increment = diff * Control.updateIncrement;
+                score += increment;
+                q.score = score;
+            }
+
+            q.answered = true;
+            Toast.makeText(getActivity(), "Updated score = " + q.score, Toast.LENGTH_SHORT).show();
         }
 
-        q.answered = true;
-        Toast.makeText(getActivity(), "Updated score = " + q.score, Toast.LENGTH_SHORT).show();
+        if(Control.spacedRepetitionOn) {
+            int calculatedIndex = 0;
+
+            if(Control.rankingsOn) {
+                if(q.score < 4.0) {
+                    if(q.score < 1.0) {
+                        calculatedIndex = indicesIndex + 3;
+                    } else if(q.score < 2.0) {
+                        calculatedIndex = indicesIndex + 4;
+                    } else if(q.score < 3.0) {
+                        calculatedIndex = indicesIndex + 5;
+                    } else {
+                        calculatedIndex = Control.questionIndices.size();
+                    }
+
+                    Log.d("ASH", "Calculated Index = " + calculatedIndex);
+
+                    if(calculatedIndex > Control.questionIndices.size() - 1) {
+                        Control.questionIndices.add(currQuestionIndex);
+                        Log.d("ASH", "Added currQuestionIndex " + currQuestionIndex + " to end");
+                    } else {
+                        Control.questionIndices.add(calculatedIndex, currQuestionIndex);
+                        Log.d("ASH", "Added currQuestionIndex " + currQuestionIndex + " to indicesIndex " + calculatedIndex);
+                    }
+                }
+            } else {
+                // 1 = soon
+                // 2 = later
+                // 3 = never
+            }
+
+        }
     }
 
     @Override
@@ -498,7 +570,7 @@ public class QuizQuestionFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        public void onNextPressed(int curr, boolean lastQuestion, int rating);
+        public void onNextPressed(int curr, boolean lastQuestion);
 
         public void onPrevPressed(int curr);
 
