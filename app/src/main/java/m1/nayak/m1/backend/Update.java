@@ -31,6 +31,7 @@ public class Update {
             Log.d("ASH", "updated score = " + updatedScore);
 
             p.put("Score_" + Control.user, updatedScore);
+            p.put("isHighYield", q.isHighYield);
             p.save();
         }
 
@@ -49,6 +50,7 @@ public class Update {
         p.put("Subclass", Control.update.subject);
         p.put("Topic", Control.update.topic);
         p.put("Author", Control.update.author);
+        p.put("isHighYield", Control.update.isHighYield);
         p.save();
 
     }

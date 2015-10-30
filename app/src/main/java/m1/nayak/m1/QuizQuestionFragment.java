@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,11 +51,12 @@ public class QuizQuestionFragment extends Fragment {
     Button one, two, three, four, five;
 
     // Edit question
-    ImageView edit;
+    ImageView edit, skip, highYield;
     Dialog dialog;
     EditText editQuestion, editAnswer, editType, editScore, editAuthor;
     Spinner editClass, editSubclass, editTopic;
     ArrayAdapter<CharSequence> classAdapter, subClassAdapter, topicAdapter;
+    Switch isHighYield;
     Button saveChanges;
 
     // FC feedback
@@ -117,6 +119,26 @@ public class QuizQuestionFragment extends Fragment {
         question = (TextView) rootView.findViewById(R.id.TextView_question);
         question.setText(q.question);
 
+        // Other images
+        skip = (ImageView) rootView.findViewById(R.id.ImageView_skip);
+        highYield = (ImageView) rootView.findViewById(R.id.ImageView_highYield);
+
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                q.isHighYield = false;
+                q.answered = true;
+                boolean lastQuestion = (indicesIndex == Control.questionIndices.size() - 1) ? true : false;
+                mListener.onNextPressed(indicesIndex, lastQuestion);
+            }
+        });
+
+        if(q.isHighYield) {
+            highYield.setVisibility(View.VISIBLE);
+        } else {
+            highYield.setVisibility(View.INVISIBLE);
+        }
+
         // Edit question
         edit = (ImageView) rootView.findViewById(R.id.ImageView_editQuestion);
         dialog = new Dialog(getActivity());
@@ -132,6 +154,7 @@ public class QuizQuestionFragment extends Fragment {
         editClass = (Spinner) dialog.findViewById(R.id.Spinner_class);
         editSubclass = (Spinner) dialog.findViewById(R.id.Spinner_subclass);
         editTopic = (Spinner) dialog.findViewById(R.id.Spinner_topic);
+        isHighYield = (Switch) dialog.findViewById(R.id.Switch_isHighYield);
         saveChanges = (Button) dialog.findViewById(R.id.Button_saveChanges);
 
         edit.setOnClickListener(new View.OnClickListener() {
@@ -142,6 +165,12 @@ public class QuizQuestionFragment extends Fragment {
                 editType.setText(q.type);
                 editScore.setText("" + q.score);
                 editAuthor.setText(q.author);
+
+                if(q.isHighYield) {
+                    isHighYield.setChecked(true);
+                } else {
+                    isHighYield.setChecked(false);
+                }
 
                 String[] classes = new String[Control.classes.size()];
                 int index = 0;
@@ -195,6 +224,7 @@ public class QuizQuestionFragment extends Fragment {
                 q.subject = editSubclass.getSelectedItem().toString();
                 q.topic = editTopic.getSelectedItem().toString();
                 q.author = editAuthor.getText().toString();
+                q.isHighYield = isHighYield.isChecked();
 
                 Log.d("ASH", q.question + "," + q.answer + "," + q.type + "," + q.score + "," + q.className + "," + q.subject + "," + q.topic + "," + q.author);
                 Control.update = q;
@@ -330,7 +360,7 @@ public class QuizQuestionFragment extends Fragment {
                         String answer = "";
                         String[] parts = a.split(";");
                         for (String s : parts) {
-                            answer += "• " + s.trim() + "\n";
+                            answer += "• " + s.trim() + "<br>";
                         }
                         a = answer;
                     }

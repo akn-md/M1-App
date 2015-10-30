@@ -19,12 +19,14 @@ public abstract class Question {
 
     public boolean answered;
     public boolean answeredCorrectly;
+    public boolean isHighYield;
 
     public String className, subject, topic;
 
     public String type;
 
-    public Question(String auth, String c, String e, String i, String q, String a, double s, Date last, String sub, String top) {
+
+    public Question(String auth, String c, String e, String i, String q, String a, double s, Date last, String sub, String top, boolean IHY) {
         author = auth;
         className = c;
         entity = e;
@@ -36,5 +38,6 @@ public abstract class Question {
         subject = sub;
         topic = top;
         answeredCorrectly = true;
+        isHighYield = IHY;
     }
 }

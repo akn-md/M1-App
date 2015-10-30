@@ -9,8 +9,8 @@ public class FlashCard extends Question {
 
     public boolean trueFalse;
 
-    public FlashCard(String auth, String c, String e, String i, String q, String a, double s, Date last, String sub, String top) {
-        super(auth, c, e, i, q, a, s, last, sub, top);
+    public FlashCard(String auth, String c, String e, String i, String q, String a, double s, Date last, String sub, String top, boolean IHY) {
+        super(auth, c, e, i, q, a, s, last, sub, top, IHY);
         trueFalse = false;
         type = "FC";
     }

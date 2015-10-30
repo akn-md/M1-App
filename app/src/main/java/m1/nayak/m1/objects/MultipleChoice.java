@@ -10,8 +10,8 @@ public class MultipleChoice extends Question {
 
     public ArrayList<String> choices;
 
-    public MultipleChoice(String auth, String cc, String e, String i, String q, String a, ArrayList<String> c, double score, Date last, String sub, String top, String t) {
-        super(auth, cc, e, i, q, a, score, last, sub, top);
+    public MultipleChoice(String auth, String cc, String e, String i, String q, String a, ArrayList<String> c, double score, Date last, String sub, String top, String t, boolean IHY) {
+        super(auth, cc, e, i, q, a, score, last, sub, top, IHY);
         choices = c;
         type = t;
     }

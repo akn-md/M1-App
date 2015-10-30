@@ -83,6 +83,10 @@ public class Query {
             query.whereLessThan("Score_" + Control.user, Control.minScore);
         }
 
+        if (Control.highYield) {
+            query.whereEqualTo("isHighYield", true);
+        }
+
 //        query.orderByAscending("Score");
 //        query.setLimit(count);
         query.setLimit(1000);
@@ -108,7 +112,7 @@ public class Query {
         }
 
         Control.questionIndices = new ArrayList<Integer>(Control.questions.size());
-        for(int i = 0; i < Control.questions.size(); i++) {
+        for (int i = 0; i < Control.questions.size(); i++) {
             Control.questionIndices.add(i);
         }
     }
@@ -208,7 +212,7 @@ public class Query {
                 Collections.shuffle(answerChoices);
 
                 // create Question object and add to array list
-                MultipleChoice mc = new MultipleChoice("","",entity, id, question, answer, answerChoices, score, date, "Enzymes", stem2, "");
+                MultipleChoice mc = new MultipleChoice("", "", entity, id, question, answer, answerChoices, score, date, "Enzymes", stem2, "", false);
                 Control.questions.add(mc);
 
                 Log.d("ash", "Choices:");
@@ -384,9 +388,10 @@ public class Query {
 
         String[] currSubClasses = null, pastSubClasses = null;
 
-        Log.d("ASH", numCurrQuestions + "," + numPastQuestions);
+        Log.d("ASH", "numCurrQuestions = " + numCurrQuestions);
+        Log.d("ASH", "numPastQuestions = " + numPastQuestions);
 
-
+        // Get a list of all current-material subclasses
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Subclass");
         query.whereEqualTo("isCurrentMaterial", true);
         List<ParseObject> ret = query.find();
@@ -400,8 +405,10 @@ public class Query {
             numCurrQuestions = 0;
         }
 
+        // Get a list of all past-material subclasses
         query = ParseQuery.getQuery("Subclass");
         query.whereEqualTo("isCurrentMaterial", false);
+
         ret = query.find();
 
         if (ret.size() > 0) {
@@ -413,50 +420,83 @@ public class Query {
             numPastQuestions = 0;
         }
 
+        Log.d("ASH", "numCurrQuestions (adjusted) = " + numCurrQuestions);
+        Log.d("ASH", "numPastQuestions (adjusted) = " + numPastQuestions);
+
+        // Create all past-material questions
         for (int i = 0; i < numPastQuestions; i++) {
             int combinedIndex = -1;
             int qIndex = -1;
 
+            int index = (int) (Math.random() * pastSubClasses.length);
+            String subClass = pastSubClasses[index];
+            query = ParseQuery.getQuery("GeneralKnowledge");
+            query.whereEqualTo("Subclass", subClass);
+            query.whereEqualTo("isHighYield", true);
+            query.orderByAscending("updatedAt");
+            query.addAscendingOrder("Score_" + Control.user);
+
+            ret = query.find();
+
             do {
-                int index = (int) (Math.random() * pastSubClasses.length);
-                String subClass = pastSubClasses[index];
-                query = ParseQuery.getQuery("GeneralKnowledge");
-                query.whereEqualTo("Subclass", subClass);
-                ret = query.find();
+                qIndex++;
 
-                qIndex = (int) (Math.random() * ret.size());
-
+//                qIndex = (int) (Math.random() * ret.size());
                 String combined = index + "" + qIndex;
 
                 combinedIndex = Integer.parseInt(combined);
-                Log.d("ASH", index + "," + qIndex + "," + combinedIndex);
+                Log.d("ASH", "Trying " + index + "," + qIndex + "," + combinedIndex);
             } while (usedIndicies.contains(combinedIndex));
 
-            usedIndicies.add(combinedIndex);
-            createQuestion(ret, qIndex, allAnswerChoices);
+
+            if(qIndex >= ret.size()) {
+                i--;
+            } else {
+                usedIndicies.add(combinedIndex);
+                Log.d("ASH", "Added " + index + "," + qIndex + "," + combinedIndex);
+                createQuestion(ret, qIndex, allAnswerChoices);
+            }
         }
+
+        usedIndicies.clear();
 
         for (int i = 0; i < numCurrQuestions; i++) {
             int combinedIndex = -1;
             int qIndex = -1;
 
-            do {
-                int index = (int) (Math.random() * currSubClasses.length);
-                String subClass = currSubClasses[index];
-                query = ParseQuery.getQuery("GeneralKnowledge");
-                query.whereEqualTo("Subclass", subClass);
-                ret = query.find();
+            int index = (int) (Math.random() * currSubClasses.length);
+            String subClass = currSubClasses[index];
+            query = ParseQuery.getQuery("GeneralKnowledge");
+            query.whereEqualTo("Subclass", subClass);
+            query.whereEqualTo("isHighYield", true);
+            query.orderByAscending("updatedAt");
+            query.addAscendingOrder("Score_" + Control.user);
 
-                qIndex = (int) (Math.random() * ret.size());
+            ret = query.find();
+
+            do {
+                qIndex++;
+
+//                qIndex = (int) (Math.random() * ret.size());
 
                 String combined = index + "" + qIndex;
 
                 combinedIndex = Integer.parseInt(combined);
-                Log.d("ASH", index + "," + qIndex + "," + combinedIndex);
+                Log.d("ASH", "Trying " + index + "," + qIndex + "," + combinedIndex);
             } while (usedIndicies.contains(combinedIndex));
 
-            usedIndicies.add(combinedIndex);
-            createQuestion(ret, qIndex, allAnswerChoices);
+            if(qIndex >= ret.size()) {
+                i--;
+            } else {
+                usedIndicies.add(combinedIndex);
+                Log.d("ASH", "Added " + index + "," + qIndex + "," + combinedIndex);
+                createQuestion(ret, qIndex, allAnswerChoices);
+            }
+        }
+
+        Control.questionIndices = new ArrayList<Integer>(Control.questions.size());
+        for (int i = 0; i < Control.questions.size(); i++) {
+            Control.questionIndices.add(i);
         }
 
     }
@@ -470,6 +510,7 @@ public class Query {
         String subclass = ret.get(i).getString("Subclass");
         String topic = ret.get(i).getString("Topic");
         String author = ret.get(i).getString("Author");
+        boolean isHighYield = ret.get(i).getBoolean("isHighYield");
         String question = "", answer = null;
 
         if (type.equals("FC") || type.equals("SA") || type.equals("TF")) {
@@ -492,13 +533,15 @@ public class Query {
             }
 
             // Create question object and add
-            if(author ==  null)
+            if (author == null)
                 author = "Ashwin";
-            FlashCard fc = new FlashCard(author, className, "GeneralKnowledge", id, question, answer, score, date, subclass, topic);
+            FlashCard fc = new FlashCard(author, className, "GeneralKnowledge", id, question, answer, score, date, subclass, topic, isHighYield);
             if (type.equals("TF")) {
                 fc.trueFalse = true;
                 fc.question = "True or False: " + fc.question;
             }
+
+            fc.type = type;
             Control.questions.add(fc);
 
             // Type = multiple choice or OR
@@ -525,8 +568,6 @@ public class Query {
                         question += ".";
                     }
                 }
-
-                Log.d("ASH", "question = " + question);
             } else {
                 question = ret.get(i).getString("Q");
                 answerChoices = new ArrayList<String>(4);
@@ -580,9 +621,9 @@ public class Query {
             }
 
             // Create question object and add
-            if(author ==  null)
+            if (author == null)
                 author = "Ashwin";
-            MultipleChoice mc = new MultipleChoice(author, className, "GeneralKnowledge", id, question, answer, answerChoices, score, date, subclass, topic, type);
+            MultipleChoice mc = new MultipleChoice(author, className, "GeneralKnowledge", id, question, answer, answerChoices, score, date, subclass, topic, type, isHighYield);
             Control.questions.add(mc);
         }
 
